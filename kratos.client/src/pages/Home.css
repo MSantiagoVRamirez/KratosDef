@@ -1,0 +1,217 @@
+/* Estilos base */
+body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    min-height: 100vh;
+}
+.home-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #000000;
+}
+
+/* Hero Section */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, #6e8efb, #185f6b );
+    color: white;
+    min-height: 70vh;
+}
+
+.hero-content {
+    max-width: 600px;
+}
+
+.hero-title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+a {
+    font-weight: 500;
+    color: #000000;
+    text-decoration: inherit;
+}
+.hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.hero-image {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+.placeholder-image {
+    width: 400px;
+    height: 300px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+/* Features Section */
+.features-section {
+    padding: 4rem 2rem;
+    text-align: center;
+    background-color: #6e8efb;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #000f;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #3498db;
+}
+
+/* Testimonials */
+.testimonials-section {
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 800px;
+    margin: 3rem auto;
+}
+
+.testimonial-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #2c3e50;
+}
+
+.testimonial-author {
+    font-weight: bold;
+    margin-top: 1rem;
+    color: #6e8efb;
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 4rem 2rem;
+    text-align: center;
+    background: linear-gradient(135deg, #185f6b, #6e8efb);
+    color: white;
+}
+
+    .cta-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+/* Botones */
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: white;
+    color: #6e8efb;
+}
+
+    .btn-primary:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+    }
+
+.btn-secondary {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+    .btn-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .hero-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem 1rem;
+    }
+
+    .hero-content {
+        margin-bottom: 2rem;
+    }
+
+    .hero-image {
+        width: 100%;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+}
