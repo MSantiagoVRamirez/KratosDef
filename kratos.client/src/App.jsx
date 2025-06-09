@@ -10,24 +10,9 @@ import Home from './pages/Home';
 
 function App() {
     return (
-        <Router>
-            <AuthProvider>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/unauthorized" element={<Unauthorized />} />
-
-                    {/* Rutas Protegidas */}
-                    <Route element={<ProtectedRoute />}>
-                        <Route element={<MainLayout />}>
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            {/* Agrega más rutas protegidas aquí */}
-                            <Route path="*" element={<Dashboard />} />
-                        </Route>
-                    </Route>
-                </Routes>
-            </AuthProvider>
-        </Router>
+    <div className="App">
+      <Home />
+    </div>
     );
 }
 
