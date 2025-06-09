@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ActividadEconomicaService from '../Services/actividadEconomicaService'; // Asumiendo que el servicio está en este archivo
+import ActividadEconomicaService from '../Services/actividadEconomicaService';
 
 const Home = () => {
   const [actividades, setActividades] = useState([]);
