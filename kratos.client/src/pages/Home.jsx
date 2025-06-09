@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+
 import ActividadEconomicaService from '../Services/actividadEconomicaService';
 
 const Home = () => {
