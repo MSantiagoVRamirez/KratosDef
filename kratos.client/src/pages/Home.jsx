@@ -1,72 +1,208 @@
-// Archivo codificado en UTF-8
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './Home.css'; // Archivo de estilos que crearemos despu閟
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import ActividadEconomicaService from '../Services/actividadEconomicaService'; // Asumiendo que el servicio est谩 en este archivo
 
-function Home() {
+const Home = () => {
+  const [actividades, setActividades] = useState([]);
+  const [currentActividad, setCurrentActividad] = useState({
+    id: 0,
+    codigoCiiu: 0,
+    nombre: '',
+    descripcion: '',
+    categoria: ''
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchActividades();
+  }, []);
+
+  const fetchActividades = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await ActividadEconomicaService.getAll();
+      setActividades(response.data);
+    } catch (err) {
+      setError('Error al cargar las actividades econ贸micas');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentActividad({
+      ...currentActividad,
+      [name]: name === 'codigoCiiu' ? parseInt(value) || 0 : value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (isEditing) {
+        await ActividadEconomicaService.update(currentActividad);
+      } else {
+        await ActividadEconomicaService.create(currentActividad);
+      }
+      resetForm();
+      fetchActividades();
+    } catch (err) {
+      setError('Error al guardar la actividad econ贸mica');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const editActividad = (actividad) => {
+    setCurrentActividad(actividad);
+    setIsEditing(true);
+  };
+
+  const deleteActividad = async (id) => {
+    if (window.confirm('驴Est谩 seguro de eliminar esta actividad econ贸mica?')) {
+      setLoading(true);
+      try {
+        await ActividadEconomicaService.remove(id);
+        fetchActividades();
+      } catch (err) {
+        setError('Error al eliminar la actividad econ贸mica');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setCurrentActividad({
+      id: 0,
+      codigoCiiu: 0,
+      nombre: '',
+      descripcion: '',
+      categoria: ''
+    });
+    setIsEditing(false);
+  };
+
   return (
-    <div className="home-container">
-      {/* Hero Section */}
-      <header className="hero-section">
-        <div className="hero-content">
-          <h1 className="hero-title">Bienvenido a Kratos App</h1>
-          <p className="hero-subtitle">Tu soluci髇 integral para gesti髇 y productividad</p>
-          <div className="hero-buttons">
-            <Link to="/login" className="btn btn-primary">Iniciar Sesi髇</Link>
-            <Link to="/register" className="btn btn-secondary">Registrarse</Link>
-          </div>
-        </div>
-        <div className="hero-image">
-          {/* Puedes reemplazar esto con una imagen real */}
-          <div className="placeholder-image"></div>
-        </div>
-      </header>
+    <div className="container mt-4">
+      <h2>Gesti贸n de Actividades Econ贸micas</h2>
+      
+      {error && <div className="alert alert-danger">{error}</div>}
+      {loading && <div className="text-center">Cargando...</div>}
 
-      {/* Features Section */}
-      <section className="features-section">
-        <h2 className="section-title">Nuestras Caracter韘ticas</h2>
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">??</div>
-            <h3>R醦ido y Eficiente</h3>
-            <p>Tecnolog韆 de vanguardia para m醲ima productividad.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">??</div>
-            <h3>Seguridad Garantizada</h3>
-            <p>Tus datos siempre protegidos con cifrado avanzado.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">??</div>
-            <h3>Sincronizaci髇 en Tiempo Real</h3>
-            <p>Tus datos actualizados en todos tus dispositivos.</p>
-          </div>
+      <div className="row">
+        <div className="col-md-6">
+          <h4>{isEditing ? 'Editar Actividad' : 'Nueva Actividad'}</h4>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label">C贸digo CIIU</label>
+              <input
+                type="number"
+                className="form-control"
+                name="codigoCiiu"
+                value={currentActividad.codigoCiiu}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Nombre</label>
+              <input
+                type="text"
+                className="form-control"
+                name="nombre"
+                value={currentActividad.nombre}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Descripci贸n</label>
+              <textarea
+                className="form-control"
+                name="descripcion"
+                value={currentActividad.descripcion}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Categor铆a</label>
+              <input
+                type="text"
+                className="form-control"
+                name="categoria"
+                value={currentActividad.categoria}
+                onChange={handleInputChange}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary me-2" disabled={loading}>
+              {isEditing ? 'Actualizar' : 'Guardar'}
+            </button>
+            {isEditing && (
+              <button type="button" className="btn btn-secondary" onClick={resetForm} disabled={loading}>
+                Cancelar
+              </button>
+            )}
+          </form>
         </div>
-      </section>
 
-      {/* Testimonials Section */}
-      <section className="testimonials-section">
-        <h2 className="section-title">Lo que dicen nuestros usuarios</h2>
-        <div className="testimonials-grid">
-          <div className="testimonial-card">
-            <p>"Esta aplicaci髇 ha transformado completamente mi flujo de trabajo."</p>
-            <div className="testimonial-author">- Mar韆 G.</div>
-          </div>
-          <div className="testimonial-card">
-            <p>"La mejor inversi髇 que he hecho para mi negocio este a駉."</p>
-            <div className="testimonial-author">- Carlos R.</div>
-          </div>
+        <div className="col-md-6">
+          <h4>Lista de Actividades Econ贸micas</h4>
+          {actividades.length === 0 ? (
+            <p>No hay actividades econ贸micas registradas</p>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th>C贸digo</th>
+                    <th>Nombre</th>
+                    <th>Categor铆a</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {actividades.map((actividad) => (
+                    <tr key={actividad.id}>
+                      <td>{actividad.codigoCiiu}</td>
+                      <td>{actividad.nombre}</td>
+                      <td>{actividad.categoria}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-warning me-1"
+                          onClick={() => editActividad(actividad)}
+                          disabled={loading}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => deleteActividad(actividad.id)}
+                          disabled={loading}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="cta-section">
-        <h2>縇isto para comenzar?</h2>
-        <p>趎ete a miles de usuarios satisfechos hoy mismo.</p>
-        <Link to="/register" className="btn btn-large">Reg韘trate Gratis</Link>
-      </section>
+      </div>
     </div>
   );
-}
+};
 
 export default Home;
