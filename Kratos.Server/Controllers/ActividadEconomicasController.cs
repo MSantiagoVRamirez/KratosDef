@@ -24,16 +24,6 @@ namespace kratos.Server.Controllers
         [Route("insertar")]
         public async Task<IActionResult> Insertar([FromBody] ActividadEconomicas actividad)
         {
-            if (actividad == null)
-            {
-                return BadRequest("Datos de actividad inválidos.");
-            }
-
-            // Validación de modelo
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
             await _context.ActividadEconomicas.AddAsync(actividad);
             await _context.SaveChangesAsync();

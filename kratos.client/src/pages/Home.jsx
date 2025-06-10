@@ -7,7 +7,7 @@ const Home = () => {
     const [actividades, setActividades] = useState([]);
     const [currentActividad, setCurrentActividad] = useState({
         id: 0,
-        codigoCiiu: 0,
+        codigoCiiu: '',
         nombre: '',
         descripcion: '',
         categoria: ''
