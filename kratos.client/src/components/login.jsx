@@ -24,7 +24,7 @@ const Login = () => {
         setError(result.message);
       }
     } catch {
-      setError('Error de conexión con el servidor.');
+      setError('Error de conexiï¿½n con el servidor.');
     }
 
     setIsLoading(false);
@@ -33,7 +33,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-form">
-        <h2>Iniciar Sesión</h2>
+        <h2>Iniciar Sesion</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -47,7 +47,7 @@ const Login = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Contraseña:</label>
+            <label htmlFor="password">ContraseÃ±a:</label>
             <input
               type="password"
               id="password"

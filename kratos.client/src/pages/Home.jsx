@@ -44,7 +44,7 @@ const Home = () => {
 };
 
     const validateActividad = (actividad) => {
-        if (!actividad.codigoCiiu || actividad.codigoCiiu <= 0) return 'El código CIIU debe ser mayor que 0';
+        if (!actividad.codigoCiiu || actividad.codigoCiiu <= '') return 'El código CIIU debe tener valores';
         if (!actividad.nombre || actividad.nombre.trim() === '') return 'El nombre es obligatorio';
         return null;
     };
@@ -104,7 +104,7 @@ const Home = () => {
     const resetForm = () => {
         setCurrentActividad({
             id: 0,
-            codigoCiiu: 0,
+            codigoCiiu: '',
             nombre: '',
             descripcion: '',
             categoria: ''
@@ -131,7 +131,7 @@ const Home = () => {
                                 <div className="form-group">
                                     <label className="form-label">Código CIIU</label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         className="form-control"
                                         name="codigoCiiu"
                                         value={currentActividad.codigoCiiu}

@@ -6,12 +6,12 @@ body {
     min-width: 320px;
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #000000;
+    color: #3b1212;
 }
 
 a {
     font-weight: 500;
-    color: #000000;
+    color: #383131;
     text-decoration: inherit;
 }
 
@@ -158,7 +158,7 @@ a {
 .cta-section {
     padding: 4rem 2rem;
     text-align: center;
-    background: linear-gradient(135deg, #185f6b, #6e8efb);
+    background: linear-gradient(135deg, #185f6b, #6581db);
     color: white;
 }
 
