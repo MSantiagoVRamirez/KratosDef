@@ -19,7 +19,7 @@ const MainLayout = () => {
             {user?.nombre} - {empresa?.nombre}
           </span>
           <button onClick={logout} className="logout-btn">
-            Cerrar Sesión
+            Cerrar Sesion
           </button>
         </div>
       </nav>
@@ -32,7 +32,7 @@ const MainLayout = () => {
             <li onClick={() => navigate('/proyectos')}>Proyectos</li>
             <li onClick={() => navigate('/clientes')}>Clientes</li>
             <li onClick={() => navigate('/reportes')}>Reportes</li>
-            <li onClick={() => navigate('/configuracion')}>Configuración</li>
+            <li onClick={() => navigate('/configuracion')}>Configuraciï¿½n</li>
           </ul>
         </aside>
 
