@@ -1,217 +1,106 @@
-/* Estilos base */
-body {
-    margin: 0;
-    display: flex;
-    place-items: center;
-    min-width: 320px;
-    min-height: 100vh;
-}
-.home-container {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #000000;
-}
+/* Home.css */
 
-/* Hero Section */
-.hero-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4rem 2rem;
-    background: linear-gradient(135deg, #6e8efb, #185f6b );
-    color: white;
-    min-height: 70vh;
-}
-
-.hero-content {
-    max-width: 600px;
-}
-
-.hero-title {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
-}
-a {
-    font-weight: 500;
-    color: #000000;
-    text-decoration: inherit;
-}
-.hero-subtitle {
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 1rem;
-}
-
-.hero-image {
-    width: 50%;
+/* General container to center content */
+.container {
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure it takes at least the full viewport height */
+    padding: 20px;
 }
 
-.placeholder-image {
-    width: 400px;
-    height: 300px;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+/* Wrapper to limit the maximum width of the content */
+.content-wrapper {
+    width: 100%;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 0 auto; /* Center the content horizontally */
 }
 
-/* Features Section */
-.features-section {
-    padding: 4rem 2rem;
-    text-align: center;
-    background-color: #6e8efb;
-}
-
-.section-title {
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
-    color: #000f;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.feature-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-    .feature-card:hover {
-        transform: translateY(-5px);
-    }
-
-.feature-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.feature-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: #3498db;
-}
-
-/* Testimonials */
-.testimonials-section {
-    padding: 4rem 2rem;
+/* Styles for the title */
+.text-center {
     text-align: center;
 }
 
-.testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 800px;
-    margin: 3rem auto;
+/* Styles for the form section */
+.form-section {
+    margin-bottom: 20px;
 }
 
-.testimonial-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    border-top: 4px solid #2c3e50;
+/* Styles for form elements */
+.form-group {
+    margin-bottom: 15px;
 }
 
-.testimonial-author {
-    font-weight: bold;
-    margin-top: 1rem;
-    color: #6e8efb;
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
 }
 
-/* CTA Section */
-.cta-section {
-    padding: 4rem 2rem;
-    text-align: center;
-    background: linear-gradient(135deg, #185f6b, #6e8efb);
-    color: white;
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensure padding doesn't affect the overall width */
 }
 
-    .cta-section h2 {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .cta-section p {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-        opacity: 0.9;
-    }
-
-/* Botones */
+/* Styles for buttons */
 .btn {
-    display: inline-block;
-    padding: 0.8rem 1.5rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
 }
 
 .btn-primary {
-    background-color: white;
-    color: #6e8efb;
+    background-color: #007bff;
 }
 
     .btn-primary:hover {
-        background-color: #f8f9fa;
-        transform: translateY(-2px);
+        background-color: #0056b3;
     }
 
 .btn-secondary {
-    background-color: transparent;
-    color: white;
-    border: 2px solid white;
+    background-color: #6c757d;
 }
 
     .btn-secondary:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
+        background-color: #545b62;
     }
 
-.btn-large {
-    padding: 1rem 2rem;
-    font-size: 1.2rem;
+/* Styles for the list section */
+.list-section {
+    margin-top: 20px;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .hero-section {
+/* Styles for the table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+    .table th,
+    .table td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .table th {
+        background-color: #f2f2f2;
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    /* Stack form and list sections vertically on smaller screens */
+    .row {
         flex-direction: column;
-        text-align: center;
-        padding: 2rem 1rem;
     }
 
-    .hero-content {
-        margin-bottom: 2rem;
-    }
-
-    .hero-image {
+    .col-md-6 {
         width: 100%;
-    }
-
-    .hero-buttons {
-        justify-content: center;
-    }
-
-    .hero-title {
-        font-size: 2.2rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.2rem;
     }
 }

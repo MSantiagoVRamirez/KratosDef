@@ -1,59 +1,69 @@
-using kratos.Server.Services.Seguridad;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Kratos.Server.Models;
+    // Pseudocódigo:
+    // 1. Definir la política CORS con el nombre correcto y el origen específico.
+    // 2. Registrar la política en los servicios.
+    // 3. Usar la política en el middleware antes de Authentication y Authorization.
+    // 4. Asegurarse de que el nombre de la política coincida en ambos lugares.
 
-var builder = WebApplication.CreateBuilder(args);
+    using kratos.Server.Services.Seguridad;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Kratos.Server.Models;
 
-// 1. Configurar servicios
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAllOrigins",
-        policyBuilder => policyBuilder.AllowAnyOrigin()
-                                      .AllowAnyMethod()
-                                      .AllowAnyHeader());
-});
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<KratosContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+    // 1. Configurar servicios
+    builder.Services.AddCors(options =>
     {
-        options.LoginPath = "/Login/IniciarSesion";
-        options.LogoutPath = "/Login/CerrarSesion";
-        options.AccessDeniedPath = "/AccesoDenegado";
+        options.AddPolicy("MyAllowSpecificOrigins",
+            policy =>
+            {
+                policy.WithOrigins("https://localhost:54366") // Reemplaza con el origen de tu frontend
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials(); // Si necesitas cookies o autenticación
+            });
     });
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddDbContext<KratosContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Configuración de Swagger
-builder.Services.AddSwaggerGen();
-builder.Services.AddOpenApi();
-builder.Services.AddScoped<IUsuarioService, Usuario>();
+    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Login/IniciarSesion";
+            options.LogoutPath = "/Login/CerrarSesion";
+            options.AccessDeniedPath = "/AccesoDenegado";
+        });
 
-var app = builder.Build();
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
 
-// 3. Middleware de archivos estáticos
-app.UseDefaultFiles();
-app.UseStaticFiles();
+    // 2. Configuración de Swagger
+    builder.Services.AddSwaggerGen();
+    builder.Services.AddOpenApi();
+    builder.Services.AddScoped<IUsuarioService, Usuario>();
 
-// 4. Middleware de Swagger (solo en desarrollo)
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.MapOpenApi();
-}
-// 5. Seguridad y rutas
-app.UseHttpsRedirection();
+    var app = builder.Build();
 
-app.UseAuthentication(); // Muy importante que esté ANTES de Authorization
-app.UseAuthorization();
+    // 3. Middleware de archivos estáticos y routing
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+    app.UseRouting();
 
-app.MapControllers();
-app.MapFallbackToFile("/index.html");
+    app.UseCors("MyAllowSpecificOrigins"); // Usar el nombre correcto de la política
 
-app.Run();
-//https://localhost:7054/swagger/index.html
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+    app.MapFallbackToFile("/index.html");
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        app.MapOpenApi();
+    }
+
+    app.Run();
+    //https://localhost:7054/swagger/index.html// En tu Program.cs o Startup.cs
