@@ -35,13 +35,13 @@ const Home = () => {
         }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setCurrentActividad({
-            ...currentActividad,
-            [name]: name === 'codigoCiiu' ? parseInt(value) || 0 : value
-        });
-    };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentActividad({
+        ...currentActividad,
+        [name]: name === 'codigoCiiu' ? value.toString() : value // Convertir a string
+    });
+};
 
     const validateActividad = (actividad) => {
         if (!actividad.codigoCiiu || actividad.codigoCiiu <= 0) return 'El código CIIU debe ser mayor que 0';
