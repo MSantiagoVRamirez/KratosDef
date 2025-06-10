@@ -115,6 +115,10 @@ const Home = () => {
     return (
         <div>
             <h2 className="text-center">Gestión de Actividades Económicas</h2>
+                 <div className="hero-buttons">
+                        <Link to="/Inicio" className="btn btn-primary">volver </Link>
+                  
+                      </div>
             <div className="container">
                 <div className="content-wrapper">
                     {error && <div className="alert alert-danger text-center">{error}</div>}
