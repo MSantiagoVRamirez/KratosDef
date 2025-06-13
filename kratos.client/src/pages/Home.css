@@ -203,7 +203,7 @@ input, textarea {
     border: 1px solid var(--cream-dark);
     border-radius: 4px;
     font-size: 1rem;
-    background-color: var(--cream-light);
+    background-color: #333333;
 }
 
 textarea {

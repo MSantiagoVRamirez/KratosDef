@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import RegimenTributarioService from '../services/RegimenesTributariosService';
+import authService from '../services/IniciarSesion'; // Importa el servicio de autenticación
 import './Home.css';
 
 const Regimenes = () => {
@@ -9,8 +10,7 @@ const Regimenes = () => {
         id: 0,
         codigo: '',
         nombre: '',
-        descripcion: '',
-        tipo: ''
+        descripcion: ''
     });
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -57,9 +57,6 @@ const Regimenes = () => {
         }
         if (!currentRegimen.descripcion || currentRegimen.descripcion.trim() === '') {
             errors.push('La descripción es obligatoria');
-        }
-        if (!currentRegimen.tipo || currentRegimen.tipo.trim() === '') {
-            errors.push('El tipo es obligatorio');
         }
         return errors;
     };
@@ -123,8 +120,7 @@ const Regimenes = () => {
             id: 0,
             codigo: '',
             nombre: '',
-            descripcion: '',
-            tipo: ''
+            descripcion: ''
         });
         setIsEditing(false);
     };
@@ -135,6 +131,16 @@ const Regimenes = () => {
 
     const isActive = (path) => {
         return location.pathname === path;
+    };
+
+    const handleLogout = async () => {
+        try {
+            await authService.cerrarSesion();
+            navigate('/login'); // Redirige a la página de inicio de sesión
+        } catch (error) {
+            setError('Error al cerrar sesión');
+            console.error(error);
+        }
     };
 
     return (
@@ -150,6 +156,9 @@ const Regimenes = () => {
                 <div className="navbar-right">
                     <div className="user-menu">
                         <span className="user-avatar">US</span>
+                        <button className="logout-button" onClick={handleLogout}>
+                            Cerrar Sesión
+                        </button>
                     </div>
                 </div>
             </nav>
@@ -161,7 +170,7 @@ const Regimenes = () => {
                         className={`menu-item ${isActive('/Home') ? 'active' : ''}`}
                         onClick={() => navigate('/Home')}
                     >
-                        <span>Actidad Economica</span>
+                        <span>Actividad Económica</span>
                     </div>
                     <div
                         className={`menu-item ${isActive('/Regimenes') ? 'active' : ''}`}
@@ -175,7 +184,6 @@ const Regimenes = () => {
                     >
                         <span>Tipos de Sociedad</span>
                     </div>
-                   
                 </div>
             </aside>
 
@@ -223,17 +231,6 @@ const Regimenes = () => {
                                         id="nombre"
                                         name="nombre"
                                         value={currentRegimen.nombre}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="tipo">Tipo</label>
-                                    <input
-                                        type="text"
-                                        id="tipo"
-                                        name="tipo"
-                                        value={currentRegimen.tipo}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -290,7 +287,6 @@ const Regimenes = () => {
                                         <tr>
                                             <th>Código</th>
                                             <th>Nombre</th>
-                                            <th>Tipo</th>
                                             <th>Descripción</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -300,7 +296,6 @@ const Regimenes = () => {
                                             <tr key={regimen.id}>
                                                 <td>{regimen.codigo}</td>
                                                 <td>{regimen.nombre}</td>
-                                                <td>{regimen.tipo}</td>
                                                 <td>
                                                     {regimen.descripcion.length > 50
                                                         ? `${regimen.descripcion.substring(0, 50)}...`

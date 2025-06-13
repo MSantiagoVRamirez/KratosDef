@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ActividadEconomicaService from '../services/actividadEconomicaServices';
+import authService from '../services/IniciarSesion'; // Importa el servicio de autenticación
 import './Home.css';
 
 const Home = () => {
@@ -137,6 +138,16 @@ const Home = () => {
         return location.pathname === path;
     };
 
+    const handleLogout = async () => {
+        try {
+            await authService.cerrarSesion();
+            navigate('/login'); // Redirige a la página de inicio de sesión
+        } catch (error) {
+            setError('Error al cerrar sesión');
+            console.error(error);
+        }
+    };
+
     return (
         <div className="app-container">
             {/* Navbar Superior */}
@@ -150,6 +161,9 @@ const Home = () => {
                 <div className="navbar-right">
                     <div className="user-menu">
                         <span className="user-avatar">US</span>
+                        <button className="logout-button" onClick={handleLogout}>
+                            Cerrar Sesión
+                        </button>
                     </div>
                 </div>
             </nav>
@@ -175,7 +189,6 @@ const Home = () => {
                     >
                         <span>Tipos de Sociedad</span>
                     </div>
-                  
                 </div>
             </aside>
 

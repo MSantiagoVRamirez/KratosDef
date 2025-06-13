@@ -7,6 +7,7 @@ body {
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #3b1212; /* Color de texto oscuro */
+
 }
 
 a {
@@ -288,4 +289,11 @@ a {
     .row {
         flex-direction: column;
     }
+}
+.auth-card {
+    background-color: white;
+    padding: 650px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
 }

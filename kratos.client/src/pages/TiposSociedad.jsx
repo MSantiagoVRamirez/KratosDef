@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import TiposSociedadesService from '../services/TiposSociedadesService';
+import authService from '../services/IniciarSesion'; // Importa el servicio de autenticación
 import './Home.css';
 
 const TiposSociedades = () => {
@@ -9,8 +10,7 @@ const TiposSociedades = () => {
         id: 0,
         codigo: '',
         nombre: '',
-        descripcion: '',
-        tipo: ''
+        descripcion: ''
     });
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -57,9 +57,6 @@ const TiposSociedades = () => {
         }
         if (!currentSociedad.descripcion || currentSociedad.descripcion.trim() === '') {
             errors.push('La descripción es obligatoria');
-        }
-        if (!currentSociedad.tipo || currentSociedad.tipo.trim() === '') {
-            errors.push('El tipo es obligatorio');
         }
         return errors;
     };
@@ -123,8 +120,7 @@ const TiposSociedades = () => {
             id: 0,
             codigo: '',
             nombre: '',
-            descripcion: '',
-            tipo: ''
+            descripcion: ''
         });
         setIsEditing(false);
     };
@@ -135,6 +131,16 @@ const TiposSociedades = () => {
 
     const isActive = (path) => {
         return location.pathname === path;
+    };
+
+    const handleLogout = async () => {
+        try {
+            await authService.cerrarSesion();
+            navigate('/login'); // Redirige a la página de inicio de sesión
+        } catch (error) {
+            setError('Error al cerrar sesión');
+            console.error(error);
+        }
     };
 
     return (
@@ -150,6 +156,9 @@ const TiposSociedades = () => {
                 <div className="navbar-right">
                     <div className="user-menu">
                         <span className="user-avatar">US</span>
+                        <button className="logout-button" onClick={handleLogout}>
+                            Cerrar Sesión
+                        </button>
                     </div>
                 </div>
             </nav>
@@ -175,7 +184,6 @@ const TiposSociedades = () => {
                     >
                         <span>Tipos de Sociedad</span>
                     </div>
-                 
                 </div>
             </aside>
 
@@ -223,17 +231,6 @@ const TiposSociedades = () => {
                                         id="nombre"
                                         name="nombre"
                                         value={currentSociedad.nombre}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="tipo">Tipo</label>
-                                    <input
-                                        type="text"
-                                        id="tipo"
-                                        name="tipo"
-                                        value={currentSociedad.tipo}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -290,7 +287,6 @@ const TiposSociedades = () => {
                                         <tr>
                                             <th>Código</th>
                                             <th>Nombre</th>
-                                            <th>Tipo</th>
                                             <th>Descripción</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -300,7 +296,6 @@ const TiposSociedades = () => {
                                             <tr key={sociedad.id}>
                                                 <td>{sociedad.codigo}</td>
                                                 <td>{sociedad.nombre}</td>
-                                                <td>{sociedad.tipo}</td>
                                                 <td>
                                                     {sociedad.descripcion.length > 50
                                                         ? `${sociedad.descripcion.substring(0, 50)}...`
