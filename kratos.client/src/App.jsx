@@ -26,39 +26,11 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
-
+                    <Route path="/Home" element={<Home />} />
+                    <Route path="/Regimenes" element={<Regimenes />} />
+                    <Route path="/TiposSociedad" element={<TiposSociedad />} />
                     {/* Rutas protegidas con MainLayout */}
-                    <Route element={<MainLayout />}>
-                        <Route path="/home" element={
-                            <ProtectedRoute>
-                                <Home />
-                            </ProtectedRoute>
-                        } />
-
-                        <Route path="/dashboard" element={
-                            <ProtectedRoute>
-                                <Dashboard />
-                            </ProtectedRoute>
-                        } />
-
-                        <Route path="/regimenes" element={
-                            <ProtectedRoute>
-                                <Regimenes />
-                            </ProtectedRoute>
-                        } />
-
-                        <Route path="/tipos-sociedad" element={
-                            <ProtectedRoute>
-                                <TiposSociedad />
-                            </ProtectedRoute>
-                        } />
-
-                        <Route path="/register" element={
-                            <ProtectedRoute>
-                                <Register />
-                            </ProtectedRoute>
-                        } />
-                    </Route>
+                
 
                     {/* Redirección para rutas no encontradas */}
                     <Route path="*" element={<Navigate to="/" replace />} />

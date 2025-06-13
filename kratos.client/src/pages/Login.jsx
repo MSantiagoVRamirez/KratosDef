@@ -7,20 +7,25 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+    const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        setSuccessMessage(''); // Limpiar mensaje de éxito
+        setSuccessMessage('');
         setLoading(true);
 
         try {
             await authService.iniciarSesion(email, password);
-            setSuccessMessage('Inicio de sesión exitoso.'); // Mensaje de éxito
-            navigate('/');
+            setSuccessMessage('Inicio de sesión exitoso. Redirigiendo...');
+            
+            // Mostrar mensaje por 2 segundos antes de redirigir
+            setTimeout(() => {
+                navigate('/home'); // Cambié a '/home' como mencionaste antes
+            }, 2000);
+            
         } catch (err) {
             setError(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
             console.error(err);
@@ -47,7 +52,7 @@ const Login = () => {
                 {successMessage && (
                     <div className="alert success-alert">
                         {successMessage}
-                        <button className="alert-close" onClick={() => setSuccessMessage('')}>×</button>
+                        {/* Quitamos el botón de cerrar ya que se cerrará automáticamente */}
                     </div>
                 )}
 

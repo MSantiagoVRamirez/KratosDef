@@ -27,40 +27,55 @@ const Login = () => {
         }
     };
 
+
     return (
-        <div className="login-container">
-            <div className="login-card">
-                <h2>Iniciar Sesión</h2>
-                {error && <div className="error-message">{error}</div>}
+        <div className="fullscreen-container">
+            <div className="login-container">
+                <div className="login-card">
+                    <h2 className="login-title">Iniciar Sesión</h2>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Correo Electrónico</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
+                    {error && (
+                        <div className="error-message">
+                            {error}
+                            <button onClick={() => setError('')} className="close-button">×</button>
+                        </div>
+                    )}
+
+                    {successMessage && (
+                        <div className="success-message">
+                            {successMessage}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="login-form">
+                        <div className="form-group">
+                            <label>Correo Electrónico</label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Contraseña</label>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <button type="submit" disabled={loading} className="submit-button">
+                            {loading ? 'Cargando...' : 'Iniciar Sesión'}
+                        </button>
+                    </form>
+
+                    <div className="login-footer">
+                        ¿No tienes cuenta? <a href="/registro" className="register-link">Regístrate aquí</a>
                     </div>
-
-                    <div className="form-group">
-                        <label>Contraseña</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Cargando...' : 'Iniciar Sesión'}
-                    </button>
-                </form>
-
-                <div className="login-footer">
-                    ¿No tienes cuenta? <a href="/registro">Regístrate aquí</a>
                 </div>
             </div>
         </div>

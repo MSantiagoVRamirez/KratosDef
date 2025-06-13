@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import RegimenTributarioService from '../services/RegimenesTributariosService';
 import './Home.css';
 
@@ -16,6 +17,8 @@ const Regimenes = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         fetchRegimenes();
@@ -130,6 +133,10 @@ const Regimenes = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
+    const isActive = (path) => {
+        return location.pathname === path;
+    };
+
     return (
         <div className="app-container">
             {/* Navbar Superior */}
@@ -150,21 +157,25 @@ const Regimenes = () => {
             {/* Sidebar */}
             <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
                 <div className="sidebar-menu">
-                    <div className="menu-item active">
-                        <span>Inicio</span>
+                    <div
+                        className={`menu-item ${isActive('/Home') ? 'active' : ''}`}
+                        onClick={() => navigate('/Home')}
+                    >
+                        <span>Actidad Economica</span>
                     </div>
-                    <div className="menu-item">
-                        <span>Regímenes</span>
+                    <div
+                        className={`menu-item ${isActive('/Regimenes') ? 'active' : ''}`}
+                        onClick={() => navigate('/Regimenes')}
+                    >
+                        <span>Regímenes Tributarios</span>
                     </div>
-                    <div className="menu-item">
-                        <span>Clientes</span>
+                    <div
+                        className={`menu-item ${isActive('/TiposSociedad') ? 'active' : ''}`}
+                        onClick={() => navigate('/TiposSociedad')}
+                    >
+                        <span>Tipos de Sociedad</span>
                     </div>
-                    <div className="menu-item">
-                        <span>Reportes</span>
-                    </div>
-                    <div className="menu-item">
-                        <span>Configuración</span>
-                    </div>
+                   
                 </div>
             </aside>
 

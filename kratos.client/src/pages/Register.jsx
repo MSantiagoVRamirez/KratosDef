@@ -12,10 +12,10 @@ const Register = () => {
         nit: '',
         telefono: '',
         dv: '',
-        tiposociedadId: null, // Asegúrate de agregar este campo si es necesario
-        actividadId: null, // Asegúrate de agregar este campo si es necesario
-        regimenId: null, // Asegúrate de agregar este campo si es necesario
-        token: '' // Asegúrate de agregar este campo si es necesario
+        tiposociedadId: '', // Se cambió a string vacío
+        actividadId: '', // Se cambió a string vacío
+        regimenId: '', // Se cambió a string vacío
+        token: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -124,6 +124,48 @@ const Register = () => {
                             value={empresaData.dv}
                             onChange={handleChange}
                         />
+                    </div>
+
+                    <div className="form-field">
+                        <label htmlFor="tiposociedadId">Tipo de Sociedad</label>
+                        <select
+                            id="tiposociedadId"
+                            name="tiposociedadId"
+                            value={empresaData.tiposociedadId}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Seleccione</option>
+                            {/* Añade aquí las opciones dinámicamente o estáticamente */}
+                        </select>
+                    </div>
+
+                    <div className="form-field">
+                        <label htmlFor="actividadId">Actividad</label>
+                        <select
+                            id="actividadId"
+                            name="actividadId"
+                            value={empresaData.actividadId}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Seleccione</option>
+                            {/* Añade aquí las opciones dinámicamente o estáticamente */}
+                        </select>
+                    </div>
+
+                    <div className="form-field">
+                        <label htmlFor="regimenId">Régimen</label>
+                        <select
+                            id="regimenId"
+                            name="regimenId"
+                            value={empresaData.regimenId}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Seleccione</option>
+                            {/* Añade aquí las opciones dinámicamente o estáticamente */}
+                        </select>
                     </div>
 
                     <div className="form-field">
