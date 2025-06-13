@@ -17,10 +17,10 @@ public class Usuario : IUsuarioService
     {
         _context = context;
     }
-    public async Task<Empresas> ObtenerEmpresa (string email , string contraseña)
+    public async Task<Empresas> ObtenerEmpresa (string email , string contrasena)
     {
         var empresa = await _context.Empresas
-            .Where(e => e.email == email && e.contraseña == contraseña)
+            .Where(e => e.email == email && e.contrasena == contrasena)
             .FirstOrDefaultAsync();
         return empresa;
             

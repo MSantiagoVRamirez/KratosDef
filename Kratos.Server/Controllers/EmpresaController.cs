@@ -25,8 +25,8 @@ namespace kratos.Server.Controllers
         [Route("RegistroEmpresa")]
         public async Task<IActionResult> RegistroEmpresa(Empresas empresas)
         {
-            empresas.contraseña = Encriptar.EncriptarClave(empresas.contraseña);
-            empresas.confirmarContraseña = Encriptar.EncriptarClave(empresas.confirmarContraseña);
+            empresas.contrasena = Encriptar.EncriptarClave(empresas.contrasena);
+            empresas.confirmarContrasena = Encriptar.EncriptarClave(empresas.confirmarContrasena);
 
             await _context.Empresas.AddAsync(empresas);
             await _context.SaveChangesAsync();
@@ -76,11 +76,11 @@ namespace kratos.Server.Controllers
                 return BadRequest("La empresa no existe.");
             }
 
-            if (!string.IsNullOrEmpty(empresa.contraseña))
-                empresaExistente.contraseña = Encriptar.EncriptarClave(empresa.contraseña);
+            if (!string.IsNullOrEmpty(empresa.contrasena))
+                empresaExistente.contrasena = Encriptar.EncriptarClave(empresa.contrasena);
 
-            if (!string.IsNullOrEmpty(empresa.confirmarContraseña))
-                empresaExistente.confirmarContraseña = Encriptar.EncriptarClave(empresa.confirmarContraseña);
+            if (!string.IsNullOrEmpty(empresa.confirmarContrasena))
+                empresaExistente.confirmarContrasena = Encriptar.EncriptarClave(empresa.confirmarContrasena);
 
             empresaExistente.tiposociedadId = empresa.tiposociedadId;
             empresaExistente.actividadId = empresa.actividadId;

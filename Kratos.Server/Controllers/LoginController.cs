@@ -11,7 +11,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
-namespace kratos.Server.api
+namespace Kratos.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -31,14 +31,14 @@ namespace kratos.Server.api
         {
        
             // Valida que la contraseña y la confirmación coincidan
-            if (empresas.contraseña != empresas.confirmarContraseña)
+            if (empresas.contrasena != empresas.confirmarContrasena)
             {
                 return BadRequest("Error: La contraseña no coincide.");
             }
 
             // Encripta la contraseña y configura otros datos
-            empresas.contraseña = Encriptar.EncriptarClave(empresas.contraseña);
-            empresas.confirmarContraseña = Encriptar.EncriptarClave(empresas.confirmarContraseña);
+            empresas.contrasena = Encriptar.EncriptarClave(empresas.contrasena);
+            empresas.confirmarContrasena = Encriptar.EncriptarClave(empresas.confirmarContrasena);
             empresas.creadoEn = DateTime.Now;
       
         
@@ -54,17 +54,17 @@ namespace kratos.Server.api
         [HttpPost("iniciarSesion")]
         public async Task<IActionResult> iniciarSesion([FromBody] IniciarSesionRequest request)
         {
-            if (string.IsNullOrEmpty(request.email) || string.IsNullOrEmpty(request.contraseña))
+            if (string.IsNullOrEmpty(request.email) || string.IsNullOrEmpty(request.contrasena))
             {
                 return BadRequest("Por favor, complete todos los campos.");
             }
-            request.contraseña = Encriptar.EncriptarClave(request.contraseña);
+            request.contrasena = Encriptar.EncriptarClave(request.contrasena);
 
-            var empresa = await _usuarioService.ObtenerEmpresa(request.email, request.contraseña);
+            var empresa = await _usuarioService.ObtenerEmpresa(request.email, request.contrasena);
 
             if (empresa == null)
             {
-                return BadRequest("Nombre de usuario o contraseña incorrectos.");
+                return BadRequest("Nombre de usuario o contrasena incorrectos.");
             }
             var Claim = new List<Claim>();
             {

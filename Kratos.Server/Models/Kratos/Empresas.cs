@@ -12,14 +12,14 @@ namespace kratos.Server.Models.Kratos
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [DataType(DataType.Password)]
-        public string contraseña { get; set; }
+        public string contrasena { get; set; }
 
 
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [DataType(DataType.Password)]
-        public string confirmarContraseña { get; set; }
+        public string confirmarContrasena { get; set; }
 
 
 

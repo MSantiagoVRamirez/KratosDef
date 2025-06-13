@@ -1,63 +1,38 @@
-import axios from 'axios';
+import axios, { API_URL } from '../api/axios';
+import ActividadEconomica from '../models/ActividadEconomica';
 
-const API_URL = 'https://localhost:7054/api/ActividadEconomicas';
-
-// Configura axios para incluir credenciales y manejar CORS
-axios.defaults.withCredentials = true;
+const ENDPOINT = 'ActividadEconomicas';
 
 const getAll = async () => {
     try {
-        const response = await axios.get(`${API_URL}/leer`);
-        return response.data;
+        const response = await axios.get(`${ENDPOINT}/leer`);
+        return response.data.map(item => new ActividadEconomica(item));
     } catch (error) {
         console.error('Error fetching actividades:', error.response?.data || error.message);
         throw error;
     }
 };
 
-const create = async (actividad) => {
+const create = async (actividadData) => {
     try {
-        // Asegurar que codigoCiiu sea string como espera el backend
-        const payload = {
-            codigoCiiu: actividad.codigoCiiu.toString(), // Convertir a string
-            nombre: actividad.nombre,
-            descripcion: actividad.descripcion,
-            categoria: actividad.categoria
-        };
+        const actividad = new ActividadEconomica(actividadData);
+        actividad.validate();
 
-        // Validación de campos requeridos
-        if (!payload.codigoCiiu || !payload.nombre || !payload.descripcion || !payload.categoria) {
-            throw new Error('Todos los campos son obligatorios');
-        }
-
-        const response = await axios.post(`${API_URL}/insertar`, payload, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        return response.data;
+        const response = await axios.post(`${ENDPOINT}/insertar`, actividad.toJSON());
+        return new ActividadEconomica(response.data);
     } catch (error) {
         console.error('Error creating actividad:', error.response?.data || error.message);
         throw error;
     }
 };
 
-const update = async (actividad) => {
+const update = async (actividadData) => {
     try {
-        const payload = {
-            id: actividad.id,
-            codigoCiiu: actividad.codigoCiiu.toString(),
-            nombre: actividad.nombre,
-            descripcion: actividad.descripcion,
-            categoria: actividad.categoria
-        };
+        const actividad = new ActividadEconomica(actividadData);
+        actividad.validate();
 
-        const response = await axios.put(`${API_URL}/editar`, payload, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        return response.data;
+        const response = await axios.put(`${ENDPOINT}/editar`, actividad.toJSON());
+        return new ActividadEconomica(response.data);
     } catch (error) {
         console.error('Error updating actividad:', error.response?.data || error.message);
         throw error;
@@ -66,12 +41,8 @@ const update = async (actividad) => {
 
 const remove = async (id) => {
     try {
-        // Forma correcta para ASP.NET Core de enviar parámetros en DELETE
-        const response = await axios.delete(`${API_URL}/eliminar`, {
-            params: { id }, // Enviar como query parameter
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        const response = await axios.delete(`${ENDPOINT}/eliminar`, {
+            params: { id }
         });
         return response.data;
     } catch (error) {

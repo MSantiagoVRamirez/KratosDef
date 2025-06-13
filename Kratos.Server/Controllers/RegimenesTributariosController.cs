@@ -20,7 +20,7 @@ namespace kratos.Server.Controllers
             _context = context;
         }
         [HttpPost]
-        [Route("RegistrarRegimenTributario")]
+        [Route("Registrar")]
         public async Task<IActionResult> RegistrarRegimenTributario(RegimenesTributarios regimen)
         {
             if (regimen == null)

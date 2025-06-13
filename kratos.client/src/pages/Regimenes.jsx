@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import ActividadEconomicaService from '../services/actividadEconomicaServices';
+import RegimenTributarioService from '../services/RegimenesTributariosService';
 import './Home.css';
 
-const Home = () => {
-    const [actividades, setActividades] = useState([]);
-    const [currentActividad, setCurrentActividad] = useState({
+const Regimenes = () => {
+    const [regimenes, setRegimenes] = useState([]);
+    const [currentRegimen, setCurrentRegimen] = useState({
         id: 0,
-        codigoCiiu: '',
+        codigo: '',
         nombre: '',
         descripcion: '',
-        categoria: ''
+        tipo: ''
     });
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -17,21 +17,20 @@ const Home = () => {
     const [success, setSuccess] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
-
     useEffect(() => {
-        fetchActividades();
+        fetchRegimenes();
     }, []);
 
-    const fetchActividades = async () => {
+    const fetchRegimenes = async () => {
         setLoading(true);
         setError(null);
         try {
-            const data = await ActividadEconomicaService.getAll();
-            setActividades(Array.isArray(data) ? data : []);
+            const data = await RegimenTributarioService.getAll();
+            setRegimenes(Array.isArray(data) ? data : []);
         } catch (err) {
-            setError('Error al cargar las actividades económicas');
+            setError('Error al cargar los regímenes tributarios');
             console.error(err);
-            setActividades([]);
+            setRegimenes([]);
         } finally {
             setLoading(false);
         }
@@ -39,25 +38,25 @@ const Home = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setCurrentActividad({
-            ...currentActividad,
-            [name]: name === 'codigoCiiu' ? value.toString() : value
+        setCurrentRegimen({
+            ...currentRegimen,
+            [name]: value
         });
     };
 
-    const validateActividad = () => {
+    const validateRegimen = () => {
         const errors = [];
-        if (!currentActividad.codigoCiiu || currentActividad.codigoCiiu <= '') {
-            errors.push('El código CIIU es requerido');
+        if (!currentRegimen.codigo || currentRegimen.codigo.trim() === '') {
+            errors.push('El código es requerido');
         }
-        if (!currentActividad.nombre || currentActividad.nombre.trim() === '') {
+        if (!currentRegimen.nombre || currentRegimen.nombre.trim() === '') {
             errors.push('El nombre es obligatorio');
         }
-        if (!currentActividad.descripcion || currentActividad.descripcion.trim() === '') {
+        if (!currentRegimen.descripcion || currentRegimen.descripcion.trim() === '') {
             errors.push('La descripción es obligatoria');
         }
-        if (!currentActividad.categoria || currentActividad.categoria.trim() === '') {
-            errors.push('La categoría es obligatoria');
+        if (!currentRegimen.tipo || currentRegimen.tipo.trim() === '') {
+            errors.push('El tipo es obligatorio');
         }
         return errors;
     };
@@ -67,7 +66,7 @@ const Home = () => {
         setError(null);
         setSuccess(null);
 
-        const validationErrors = validateActividad();
+        const validationErrors = validateRegimen();
         if (validationErrors.length > 0) {
             setError(validationErrors.join(', '));
             return;
@@ -77,14 +76,14 @@ const Home = () => {
 
         try {
             if (isEditing) {
-                await ActividadEconomicaService.update(currentActividad);
-                setSuccess('Actividad económica actualizada exitosamente');
+                await RegimenTributarioService.update(currentRegimen);
+                setSuccess('Régimen tributario actualizado exitosamente');
             } else {
-                await ActividadEconomicaService.create(currentActividad);
-                setSuccess('Actividad económica creada exitosamente');
+                await RegimenTributarioService.create(currentRegimen);
+                setSuccess('Régimen tributario creado exitosamente');
             }
             resetForm();
-            await fetchActividades();
+            await fetchRegimenes();
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Error al procesar la solicitud';
             setError(errorMsg);
@@ -94,22 +93,22 @@ const Home = () => {
         }
     };
 
-    const editActividad = (actividad) => {
-        setCurrentActividad(actividad);
+    const editRegimen = (regimen) => {
+        setCurrentRegimen(regimen);
         setIsEditing(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const deleteActividad = async (id) => {
-        if (!window.confirm('¿Está seguro de eliminar esta actividad económica?')) return;
+    const deleteRegimen = async (id) => {
+        if (!window.confirm('¿Está seguro de eliminar este régimen tributario?')) return;
 
         setLoading(true);
         try {
-            await ActividadEconomicaService.remove(id);
-            setSuccess('Actividad económica eliminada exitosamente');
-            await fetchActividades();
+            await RegimenTributarioService.remove(id);
+            setSuccess('Régimen tributario eliminado exitosamente');
+            await fetchRegimenes();
         } catch (err) {
-            setError('Error al eliminar la actividad económica');
+            setError('Error al eliminar el régimen tributario');
             console.error(err);
         } finally {
             setLoading(false);
@@ -117,18 +116,20 @@ const Home = () => {
     };
 
     const resetForm = () => {
-        setCurrentActividad({
+        setCurrentRegimen({
             id: 0,
-            codigoCiiu: '',
+            codigo: '',
             nombre: '',
             descripcion: '',
-            categoria: ''
+            tipo: ''
         });
         setIsEditing(false);
     };
+
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
+
     return (
         <div className="app-container">
             {/* Navbar Superior */}
@@ -153,7 +154,7 @@ const Home = () => {
                         <span>Inicio</span>
                     </div>
                     <div className="menu-item">
-                        <span>Actividades</span>
+                        <span>Regímenes</span>
                     </div>
                     <div className="menu-item">
                         <span>Clientes</span>
@@ -170,7 +171,7 @@ const Home = () => {
             {/* Contenido Principal */}
             <main className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
                 <div className="content-container">
-                    <h2 className="page-title">Gestión de Actividades Económicas</h2>
+                    <h2 className="page-title">Gestión de Regímenes Tributarios</h2>
 
                     {/* Alertas */}
                     <div className="alerts-container">
@@ -190,16 +191,16 @@ const Home = () => {
 
                     {/* Formulario */}
                     <div className="form-section">
-                        <h3 className="section-title">{isEditing ? 'Editar Actividad' : 'Nueva Actividad'}</h3>
+                        <h3 className="section-title">{isEditing ? 'Editar Régimen' : 'Nuevo Régimen'}</h3>
                         <form onSubmit={handleSubmit}>
                             <div className="form-vertical">
                                 <div className="form-group">
-                                    <label htmlFor="codigoCiiu">Código CIIU</label>
+                                    <label htmlFor="codigo">Código</label>
                                     <input
                                         type="text"
-                                        id="codigoCiiu"
-                                        name="codigoCiiu"
-                                        value={currentActividad.codigoCiiu}
+                                        id="codigo"
+                                        name="codigo"
+                                        value={currentRegimen.codigo}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -210,18 +211,18 @@ const Home = () => {
                                         type="text"
                                         id="nombre"
                                         name="nombre"
-                                        value={currentActividad.nombre}
+                                        value={currentRegimen.nombre}
                                         onChange={handleInputChange}
                                         required
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="categoria">Categoría</label>
+                                    <label htmlFor="tipo">Tipo</label>
                                     <input
                                         type="text"
-                                        id="categoria"
-                                        name="categoria"
-                                        value={currentActividad.categoria}
+                                        id="tipo"
+                                        name="tipo"
+                                        value={currentRegimen.tipo}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -231,7 +232,7 @@ const Home = () => {
                                     <textarea
                                         id="descripcion"
                                         name="descripcion"
-                                        value={currentActividad.descripcion}
+                                        value={currentRegimen.descripcion}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -261,15 +262,15 @@ const Home = () => {
 
                     {/* Listado */}
                     <div className="list-section">
-                        <h3 className="section-title">Listado de Actividades</h3>
+                        <h3 className="section-title">Listado de Regímenes</h3>
                         {loading ? (
                             <div className="loading-state">
                                 <div className="spinner"></div>
-                                <p>Cargando actividades...</p>
+                                <p>Cargando regímenes...</p>
                             </div>
-                        ) : (!Array.isArray(actividades) || actividades.length === 0) ? (
+                        ) : (!Array.isArray(regimenes) || regimenes.length === 0) ? (
                             <div className="empty-state">
-                                <p>No hay actividades económicas registradas</p>
+                                <p>No hay regímenes tributarios registrados</p>
                             </div>
                         ) : (
                             <div className="table-container">
@@ -278,33 +279,33 @@ const Home = () => {
                                         <tr>
                                             <th>Código</th>
                                             <th>Nombre</th>
-                                            <th>Categoría</th>
+                                            <th>Tipo</th>
                                             <th>Descripción</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {actividades.map((actividad) => (
-                                            <tr key={actividad.id}>
-                                                <td>{actividad.codigoCiiu}</td>
-                                                <td>{actividad.nombre}</td>
-                                                <td>{actividad.categoria}</td>
+                                        {regimenes.map((regimen) => (
+                                            <tr key={regimen.id}>
+                                                <td>{regimen.codigo}</td>
+                                                <td>{regimen.nombre}</td>
+                                                <td>{regimen.tipo}</td>
                                                 <td>
-                                                    {actividad.descripcion.length > 50
-                                                        ? `${actividad.descripcion.substring(0, 50)}...`
-                                                        : actividad.descripcion}
+                                                    {regimen.descripcion.length > 50
+                                                        ? `${regimen.descripcion.substring(0, 50)}...`
+                                                        : regimen.descripcion}
                                                 </td>
                                                 <td className="actions-cell">
                                                     <button
                                                         className="table-button edit"
-                                                        onClick={() => editActividad(actividad)}
+                                                        onClick={() => editRegimen(regimen)}
                                                         disabled={loading}
                                                     >
                                                         Editar
                                                     </button>
                                                     <button
                                                         className="table-button delete"
-                                                        onClick={() => deleteActividad(actividad.id)}
+                                                        onClick={() => deleteRegimen(regimen.id)}
                                                         disabled={loading}
                                                     >
                                                         Eliminar
@@ -323,4 +324,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default Regimenes;

@@ -10,5 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\Interface\" />
+    <Folder Include="src\Auth\" />
   </ItemGroup>
 </Project>

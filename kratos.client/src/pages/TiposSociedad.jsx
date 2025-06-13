@@ -1,15 +1,16 @@
+
 import { useState, useEffect } from 'react';
-import ActividadEconomicaService from '../services/actividadEconomicaServices';
+import TiposSociedadesService from '../services/TiposSociedadesService';
 import './Home.css';
 
-const Home = () => {
-    const [actividades, setActividades] = useState([]);
-    const [currentActividad, setCurrentActividad] = useState({
+const TiposSociedades = () => {
+    const [tiposSociedades, setTiposSociedades] = useState([]);
+    const [currentSociedad, setCurrentSociedad] = useState({
         id: 0,
-        codigoCiiu: '',
+        codigo: '',
         nombre: '',
         descripcion: '',
-        categoria: ''
+        tipo: ''
     });
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -17,21 +18,20 @@ const Home = () => {
     const [success, setSuccess] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
-
     useEffect(() => {
-        fetchActividades();
+        fetchTiposSociedades();
     }, []);
 
-    const fetchActividades = async () => {
+    const fetchTiposSociedades = async () => {
         setLoading(true);
         setError(null);
         try {
-            const data = await ActividadEconomicaService.getAll();
-            setActividades(Array.isArray(data) ? data : []);
+            const data = await TiposSociedadesService.getAll();
+            setTiposSociedades(Array.isArray(data) ? data : []);
         } catch (err) {
-            setError('Error al cargar las actividades económicas');
+            setError('Error al cargar los tipos de sociedades');
             console.error(err);
-            setActividades([]);
+            setTiposSociedades([]);
         } finally {
             setLoading(false);
         }
@@ -39,25 +39,25 @@ const Home = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setCurrentActividad({
-            ...currentActividad,
-            [name]: name === 'codigoCiiu' ? value.toString() : value
+        setCurrentSociedad({
+            ...currentSociedad,
+            [name]: value
         });
     };
 
-    const validateActividad = () => {
+    const validateSociedad = () => {
         const errors = [];
-        if (!currentActividad.codigoCiiu || currentActividad.codigoCiiu <= '') {
-            errors.push('El código CIIU es requerido');
+        if (!currentSociedad.codigo || currentSociedad.codigo.trim() === '') {
+            errors.push('El código es requerido');
         }
-        if (!currentActividad.nombre || currentActividad.nombre.trim() === '') {
+        if (!currentSociedad.nombre || currentSociedad.nombre.trim() === '') {
             errors.push('El nombre es obligatorio');
         }
-        if (!currentActividad.descripcion || currentActividad.descripcion.trim() === '') {
+        if (!currentSociedad.descripcion || currentSociedad.descripcion.trim() === '') {
             errors.push('La descripción es obligatoria');
         }
-        if (!currentActividad.categoria || currentActividad.categoria.trim() === '') {
-            errors.push('La categoría es obligatoria');
+        if (!currentSociedad.tipo || currentSociedad.tipo.trim() === '') {
+            errors.push('El tipo es obligatorio');
         }
         return errors;
     };
@@ -67,7 +67,7 @@ const Home = () => {
         setError(null);
         setSuccess(null);
 
-        const validationErrors = validateActividad();
+        const validationErrors = validateSociedad();
         if (validationErrors.length > 0) {
             setError(validationErrors.join(', '));
             return;
@@ -77,14 +77,14 @@ const Home = () => {
 
         try {
             if (isEditing) {
-                await ActividadEconomicaService.update(currentActividad);
-                setSuccess('Actividad económica actualizada exitosamente');
+                await TiposSociedadesService.update(currentSociedad);
+                setSuccess('Tipo de sociedad actualizado exitosamente');
             } else {
-                await ActividadEconomicaService.create(currentActividad);
-                setSuccess('Actividad económica creada exitosamente');
+                await TiposSociedadesService.create(currentSociedad);
+                setSuccess('Tipo de sociedad creado exitosamente');
             }
             resetForm();
-            await fetchActividades();
+            await fetchTiposSociedades();
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Error al procesar la solicitud';
             setError(errorMsg);
@@ -94,22 +94,22 @@ const Home = () => {
         }
     };
 
-    const editActividad = (actividad) => {
-        setCurrentActividad(actividad);
+    const editSociedad = (sociedad) => {
+        setCurrentSociedad(sociedad);
         setIsEditing(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const deleteActividad = async (id) => {
-        if (!window.confirm('¿Está seguro de eliminar esta actividad económica?')) return;
+    const deleteSociedad = async (id) => {
+        if (!window.confirm('¿Está seguro de eliminar este tipo de sociedad?')) return;
 
         setLoading(true);
         try {
-            await ActividadEconomicaService.remove(id);
-            setSuccess('Actividad económica eliminada exitosamente');
-            await fetchActividades();
+            await TiposSociedadesService.remove(id);
+            setSuccess('Tipo de sociedad eliminado exitosamente');
+            await fetchTiposSociedades();
         } catch (err) {
-            setError('Error al eliminar la actividad económica');
+            setError('Error al eliminar el tipo de sociedad');
             console.error(err);
         } finally {
             setLoading(false);
@@ -117,18 +117,20 @@ const Home = () => {
     };
 
     const resetForm = () => {
-        setCurrentActividad({
+        setCurrentSociedad({
             id: 0,
-            codigoCiiu: '',
+            codigo: '',
             nombre: '',
             descripcion: '',
-            categoria: ''
+            tipo: ''
         });
         setIsEditing(false);
     };
+
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
+
     return (
         <div className="app-container">
             {/* Navbar Superior */}
@@ -153,7 +155,7 @@ const Home = () => {
                         <span>Inicio</span>
                     </div>
                     <div className="menu-item">
-                        <span>Actividades</span>
+                        <span>Tipos de Sociedades</span>
                     </div>
                     <div className="menu-item">
                         <span>Clientes</span>
@@ -170,7 +172,7 @@ const Home = () => {
             {/* Contenido Principal */}
             <main className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
                 <div className="content-container">
-                    <h2 className="page-title">Gestión de Actividades Económicas</h2>
+                    <h2 className="page-title">Gestión de Tipos de Sociedades</h2>
 
                     {/* Alertas */}
                     <div className="alerts-container">
@@ -190,16 +192,16 @@ const Home = () => {
 
                     {/* Formulario */}
                     <div className="form-section">
-                        <h3 className="section-title">{isEditing ? 'Editar Actividad' : 'Nueva Actividad'}</h3>
+                        <h3 className="section-title">{isEditing ? 'Editar Tipo de Sociedad' : 'Nuevo Tipo de Sociedad'}</h3>
                         <form onSubmit={handleSubmit}>
                             <div className="form-vertical">
                                 <div className="form-group">
-                                    <label htmlFor="codigoCiiu">Código CIIU</label>
+                                    <label htmlFor="codigo">Código</label>
                                     <input
                                         type="text"
-                                        id="codigoCiiu"
-                                        name="codigoCiiu"
-                                        value={currentActividad.codigoCiiu}
+                                        id="codigo"
+                                        name="codigo"
+                                        value={currentSociedad.codigo}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -210,18 +212,18 @@ const Home = () => {
                                         type="text"
                                         id="nombre"
                                         name="nombre"
-                                        value={currentActividad.nombre}
+                                        value={currentSociedad.nombre}
                                         onChange={handleInputChange}
                                         required
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="categoria">Categoría</label>
+                                    <label htmlFor="tipo">Tipo</label>
                                     <input
                                         type="text"
-                                        id="categoria"
-                                        name="categoria"
-                                        value={currentActividad.categoria}
+                                        id="tipo"
+                                        name="tipo"
+                                        value={currentSociedad.tipo}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -231,7 +233,7 @@ const Home = () => {
                                     <textarea
                                         id="descripcion"
                                         name="descripcion"
-                                        value={currentActividad.descripcion}
+                                        value={currentSociedad.descripcion}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -261,15 +263,15 @@ const Home = () => {
 
                     {/* Listado */}
                     <div className="list-section">
-                        <h3 className="section-title">Listado de Actividades</h3>
+                        <h3 className="section-title">Listado de Tipos de Sociedades</h3>
                         {loading ? (
                             <div className="loading-state">
                                 <div className="spinner"></div>
-                                <p>Cargando actividades...</p>
+                                <p>Cargando tipos de sociedades...</p>
                             </div>
-                        ) : (!Array.isArray(actividades) || actividades.length === 0) ? (
+                        ) : (!Array.isArray(tiposSociedades) || tiposSociedades.length === 0) ? (
                             <div className="empty-state">
-                                <p>No hay actividades económicas registradas</p>
+                                <p>No hay tipos de sociedades registrados</p>
                             </div>
                         ) : (
                             <div className="table-container">
@@ -278,33 +280,33 @@ const Home = () => {
                                         <tr>
                                             <th>Código</th>
                                             <th>Nombre</th>
-                                            <th>Categoría</th>
+                                            <th>Tipo</th>
                                             <th>Descripción</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {actividades.map((actividad) => (
-                                            <tr key={actividad.id}>
-                                                <td>{actividad.codigoCiiu}</td>
-                                                <td>{actividad.nombre}</td>
-                                                <td>{actividad.categoria}</td>
+                                        {tiposSociedades.map((sociedad) => (
+                                            <tr key={sociedad.id}>
+                                                <td>{sociedad.codigo}</td>
+                                                <td>{sociedad.nombre}</td>
+                                                <td>{sociedad.tipo}</td>
                                                 <td>
-                                                    {actividad.descripcion.length > 50
-                                                        ? `${actividad.descripcion.substring(0, 50)}...`
-                                                        : actividad.descripcion}
+                                                    {sociedad.descripcion.length > 50
+                                                        ? `${sociedad.descripcion.substring(0, 50)}...`
+                                                        : sociedad.descripcion}
                                                 </td>
                                                 <td className="actions-cell">
                                                     <button
                                                         className="table-button edit"
-                                                        onClick={() => editActividad(actividad)}
+                                                        onClick={() => editSociedad(sociedad)}
                                                         disabled={loading}
                                                     >
                                                         Editar
                                                     </button>
                                                     <button
                                                         className="table-button delete"
-                                                        onClick={() => deleteActividad(actividad.id)}
+                                                        onClick={() => deleteSociedad(sociedad.id)}
                                                         disabled={loading}
                                                     >
                                                         Eliminar
@@ -323,4 +325,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default TiposSociedades;
