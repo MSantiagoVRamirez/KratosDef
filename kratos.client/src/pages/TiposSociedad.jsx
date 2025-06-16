@@ -184,6 +184,12 @@ const TiposSociedades = () => {
                     >
                         <span>Tipos de Sociedad</span>
                     </div>
+                    <div
+                        className={`menu-item ${isActive('/Empresa') ? 'active' : ''}`}
+                        onClick={() => navigate('/Empresa')}
+                    >
+                        <span>Empresas</span>
+                    </div>
                 </div>
             </aside>
 

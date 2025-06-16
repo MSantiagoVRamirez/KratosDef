@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import RegimenTributarioService from '../services/RegimenesTributariosService';
+import RegimenTributarioService from '../Services/RegimenesTributariosService';
 import authService from '../services/IniciarSesion'; // Importa el servicio de autenticación
 import './Home.css';
 
@@ -183,6 +183,12 @@ const Regimenes = () => {
                         onClick={() => navigate('/TiposSociedad')}
                     >
                         <span>Tipos de Sociedad</span>
+                    </div>
+                    <div
+                        className={`menu-item ${isActive('/Empresa') ? 'active' : ''}`}
+                        onClick={() => navigate('/Empresa')}
+                    >
+                        <span>Empresas</span>
                     </div>
                 </div>
             </aside>

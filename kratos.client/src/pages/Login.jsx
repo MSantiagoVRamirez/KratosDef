@@ -98,6 +98,14 @@ const Login = () => {
                         </button>
                     </p>
                 </div>
+                <div className="auth-footer">
+                    <p>
+                        Ir al Inicio{' '}
+                        <button className="link-button" onClick={() => navigate('/inicio')}>
+                            IR
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
     );

@@ -6,20 +6,21 @@ namespace kratos.Server.Models.Kratos
 {
     public class Empresas
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
 
 
-        [Required(ErrorMessage = "El campo {0} es obligatorio")]
-        [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
-        [DataType(DataType.Password)]
-        public string contrasena { get; set; }
+      [Required(ErrorMessage = "El campo Contraseña es obligatorio")]
+    [MaxLength(100, ErrorMessage = "La contraseña no puede exceder 100 caracteres")]
+    [DataType(DataType.Password)]
+    public string contrasena { get; set; }
 
-
-
-        [Required(ErrorMessage = "El campo {0} es obligatorio")]
-        [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
-        [DataType(DataType.Password)]
-        public string confirmarContrasena { get; set; }
+    [Required(ErrorMessage = "El campo Confirmar Contraseña es obligatorio")]
+    [MaxLength(100, ErrorMessage = "La confirmación no puede exceder 100 caracteres")]
+    [DataType(DataType.Password)]
+    [Compare("contrasena", ErrorMessage = "Las contraseñas no coinciden")]
+    public string confirmarContrasena { get; set; }
 
 
 

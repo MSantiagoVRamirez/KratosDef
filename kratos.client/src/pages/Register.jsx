@@ -1,10 +1,14 @@
-import { useState } from 'react';
+ï»¿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import empresaService from '../services/RegistroEmpresa'; // Asegúrate de que la ruta sea correcta
+import empresaService from '../services/RegistroEmpresa';
+import ActividadEconomicaService from '../services/actividadEconomicaServices';
+import RegimenTributarioService from '../Services/RegimenesTributariosService';
+import TiposSociedadesService from '../services/TiposSociedadesService';
+import Empresas from '../models/Empresas';
 import './Auth.css';
 
 const Register = () => {
-    const [empresaData, setEmpresaData] = useState({
+    const initialFormData = {
         razonSocial: '',
         email: '',
         contrasena: '',
@@ -12,202 +16,460 @@ const Register = () => {
         nit: '',
         telefono: '',
         dv: '',
-        tiposociedadId: '', // Se cambió a string vacío
-        actividadId: '', // Se cambió a string vacío
-        regimenId: '', // Se cambió a string vacío
-        token: ''
-    });
+        tiposociedadId: null,
+        actividadId: null,
+        regimenId: null,
+        token: '',
+        nombreComercial: '',
+        representanteLegal: ''
+    };
+
+    const [empresaData, setEmpresaData] = useState(initialFormData);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
+    const [tiposSociedad, setTiposSociedad] = useState([]);
+    const [actividades, setActividades] = useState([]);
+    const [regimenes, setRegimenes] = useState([]);
+    const [showPassword, setShowPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [passwordRequirements, setPasswordRequirements] = useState({
+        length: false,
+        uppercase: false,
+        number: false
+    });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoadingData(true);
+                const [sociedadesRes, actividadesRes, regimenesRes] = await Promise.all([
+                    TiposSociedadesService.getAll(),
+                    ActividadEconomicaService.getAll(),
+                    RegimenTributarioService.getAll()
+                ]);
+                setTiposSociedad(sociedadesRes);
+                setActividades(actividadesRes);
+                setRegimenes(regimenesRes);
+            } catch (err) {
+                console.error('Error cargando datos:', err);
+                setError('Error al cargar los datos necesarios para el registro');
+            } finally {
+                setLoadingData(false);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setEmpresaData({
-            ...empresaData,
+        setEmpresaData(prev => ({
+            ...prev,
             [name]: value
+        }));
+
+        // ValidaciÃ³n en tiempo real para contraseÃ±as
+        if (name === 'contrasena') {
+            validatePassword(value);
+        }
+    };
+
+    const validatePassword = (password) => {
+        setPasswordRequirements({
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            number: /[0-9]/.test(password)
         });
+    };
+
+    const handlePasswordBlur = () => {
+        if (empresaData.contrasena && empresaData.confirmarContrasena &&
+            empresaData.contrasena !== empresaData.confirmarContrasena) {
+            setPasswordError('Las contraseÃ±as no coinciden');
+        } else {
+            setPasswordError('');
+        }
+    };
+
+    const handleSelectChange = (e) => {
+        const { name, value } = e.target;
+        setEmpresaData(prev => ({
+            ...prev,
+            [name]: value ? Number(value) : null
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-
-        if (empresaData.contrasena !== empresaData.confirmarContrasena) {
-            setError('Las contraseñas no coinciden');
-            return;
-        }
-
-        setLoading(true);
+        setPasswordError('');
 
         try {
-            await empresaService.registroEmpresa(empresaData);
-            navigate('/login', { state: { success: 'Registro exitoso. Por favor inicia sesión.' } });
+            // Debug: log password values for troubleshooting
+            console.log('ContraseÃ±a:', empresaData.contrasena);
+            console.log('Confirmar ContraseÃ±a:', empresaData.confirmarContrasena);
+
+            // Trim passwords for comparison to avoid whitespace issues
+            const trimmedContrasena = empresaData.contrasena.trim();
+            const trimmedConfirmarContrasena = empresaData.confirmarContrasena.trim();
+
+            if (trimmedContrasena !== trimmedConfirmarContrasena) {
+                throw new Error('Las contraseÃ±as no coinciden. Por favor verifica que ambas sean idÃ©nticas.');
+            }
+
+            if (!passwordRequirements.length || !passwordRequirements.uppercase || !passwordRequirements.number) {
+                throw new Error('La contraseÃ±a no cumple con los requisitos mÃ­nimos de seguridad.');
+            }
+
+            // Crear instancia de Empresa sin enviar el ID
+            const empresa = Empresas.fromFormData({
+                ...empresaData,
+                id: undefined, // Asegurar que no se envÃ­e el ID
+                contrasena: trimmedContrasena,
+                confirmarContrasena: trimmedConfirmarContrasena
+            });
+
+            empresa.validate();
+
+            setLoading(true);
+
+            console.log('Datos a enviar:', empresa.toJSON());
+
+            await empresaService.registroEmpresa(empresa.toJSON());
+
+            navigate('/login', {
+                state: {
+                    success: 'Registro exitoso. Por favor inicia sesiÃ³n.'
+                }
+            });
         } catch (err) {
-            setError(err.message || 'Error al registrar la cuenta. Inténtalo de nuevo.');
-            console.error(err);
+            setError(err.message);
+            console.error('Registration error:', err);
         } finally {
             setLoading(false);
         }
     };
 
+    if (loadingData) {
+        return (
+            <div className="auth-container">
+                <div className="auth-card">
+                    <div className="loading-spinner">
+                        <p>Cargando datos necesarios...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="auth-container">
-            <div className="auth-card">
+            <div className="auth-card" role="main">
                 <div className="auth-header">
                     <h2>Registro de Empresa</h2>
                     <p>Completa el formulario para crear una nueva cuenta</p>
                 </div>
 
                 {error && (
-                    <div className="alert error-alert">
+                    <div className="alert error-alert" role="alert">
                         {error}
-                        <button className="alert-close" onClick={() => setError('')}>×</button>
+                        <button
+                            className="alert-close"
+                            onClick={() => setError('')}
+                            aria-label="Cerrar alerta"
+                        >
+                            Ã—
+                        </button>
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="auth-form">
+                <form onSubmit={handleSubmit} className="auth-form" noValidate aria-describedby="form-instructions">
+                    <div className="form-row">
+                        <div className="form-field">
+                            <label htmlFor="razonSocial">RazÃ³n Social*</label>
+                            <input
+                                type="text"
+                                id="razonSocial"
+                                name="razonSocial"
+                                value={empresaData.razonSocial}
+                                onChange={handleChange}
+                                required
+                                maxLength="100"
+                                placeholder="Ej: Mi Empresa SAS"
+                                aria-required="true"
+                            />
+                        </div>
+
+                        <div className="form-field">
+                            <label htmlFor="nombreComercial">Nombre Comercial*</label>
+                            <input
+                                type="text"
+                                id="nombreComercial"
+                                name="nombreComercial"
+                                value={empresaData.nombreComercial}
+                                onChange={handleChange}
+                                required
+                                maxLength="100"
+                                placeholder="Ej: Mi Marca"
+                                aria-required="true"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-field">
+                            <label htmlFor="nit">NIT*</label>
+                            <input
+                                type="text"
+                                id="nit"
+                                name="nit"
+                                value={empresaData.nit}
+                                onChange={handleChange}
+                                required
+                                maxLength="100"
+                                placeholder="Ej: 123456789"
+                                aria-required="true"
+                            />
+                        </div>
+
+                        <div className="form-field">
+                            <label htmlFor="dv">DV</label>
+                            <input
+                                type="text"
+                                id="dv"
+                                name="dv"
+                                value={empresaData.dv}
+                                onChange={handleChange}
+                                maxLength="100"
+                                placeholder="DÃ­gito de verificaciÃ³n"
+                                aria-required="false"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-field">
+                            <label htmlFor="email">Correo ElectrÃ³nico*</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={empresaData.email}
+                                onChange={handleChange}
+                                required
+                                maxLength="100"
+                                placeholder="correo@empresa.com"
+                                aria-required="true"
+                            />
+                        </div>
+
+                        <div className="form-field">
+                            <label htmlFor="telefono">TelÃ©fono*</label>
+                            <input
+                                type="tel"
+                                id="telefono"
+                                name="telefono"
+                                value={empresaData.telefono}
+                                onChange={handleChange}
+                                required
+                                maxLength="100"
+                                placeholder="Ej: 3001234567"
+                                aria-required="true"
+                            />
+                        </div>
+                    </div>
+
                     <div className="form-field">
-                        <label htmlFor="razonSocial">Razón Social</label>
+                        <label htmlFor="representanteLegal">Representante Legal*</label>
                         <input
                             type="text"
-                            id="razonSocial"
-                            name="razonSocial"
-                            value={empresaData.razonSocial}
+                            id="representanteLegal"
+                            name="representanteLegal"
+                            value={empresaData.representanteLegal}
                             onChange={handleChange}
                             required
+                            maxLength="100"
+                            placeholder="Nombre completo"
+                            aria-required="true"
                         />
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="email">Correo Electrónico</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={empresaData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-field">
-                        <label htmlFor="nit">NIT</label>
+                        <label htmlFor="token">Token de Seguridad*</label>
                         <input
                             type="text"
-                            id="nit"
-                            name="nit"
-                            value={empresaData.nit}
+                            id="token"
+                            name="token"
+                            value={empresaData.token}
                             onChange={handleChange}
                             required
+                            maxLength="100"
+                            placeholder="Token proporcionado"
+                            aria-required="true"
                         />
                     </div>
 
-                    <div className="form-field">
-                        <label htmlFor="telefono">Teléfono</label>
-                        <input
-                            type="tel"
-                            id="telefono"
-                            name="telefono"
-                            value={empresaData.telefono}
-                            onChange={handleChange}
-                            required
-                        />
+                    <div className="form-row">
+                        <div className="form-field">
+                            <label htmlFor="tiposociedadId">Tipo de Sociedad*</label>
+                            <select
+                                id="tiposociedadId"
+                                name="tiposociedadId"
+                                value={empresaData.tiposociedadId || ''}
+                                onChange={handleSelectChange}
+                                required
+                                disabled={loadingData}
+                                className="styled-select"
+                                aria-required="true"
+                            >
+                                <option value="">Seleccione un tipo</option>
+                                {tiposSociedad.map((tipo) => (
+                                    <option key={tipo.id} value={tipo.id}>
+                                        {tipo.nombre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-field">
+                            <label htmlFor="actividadId">Actividad EconÃ³mica*</label>
+                            <select
+                                id="actividadId"
+                                name="actividadId"
+                                value={empresaData.actividadId || ''}
+                                onChange={handleSelectChange}
+                                required
+                                disabled={loadingData}
+                                className="styled-select"
+                                aria-required="true"
+                            >
+                                <option value="">Seleccione una actividad</option>
+                                {actividades.map((actividad) => (
+                                    <option key={actividad.id} value={actividad.id}>
+                                        {actividad.nombre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-field">
+                            <label htmlFor="regimenId">RÃ©gimen Tributario*</label>
+                            <select
+                                id="regimenId"
+                                name="regimenId"
+                                value={empresaData.regimenId || ''}
+                                onChange={handleSelectChange}
+                                required
+                                disabled={loadingData}
+                                className="styled-select"
+                                aria-required="true"
+                            >
+                                <option value="">Seleccione un rÃ©gimen</option>
+                                {regimenes.map((regimen) => (
+                                    <option key={regimen.id} value={regimen.id}>
+                                        {regimen.nombre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
-                    <div className="form-field">
-                        <label htmlFor="dv">DV</label>
-                        <input
-                            type="text"
-                            id="dv"
-                            name="dv"
-                            value={empresaData.dv}
-                            onChange={handleChange}
-                        />
-                    </div>
+                    <div className="password-section">
+                        <div className="form-row">
+                            <div className="form-field">
+                                <label htmlFor="contrasena">ContraseÃ±a*</label>
+                                <div className="password-input-container">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="contrasena"
+                                        name="contrasena"
+                                        value={empresaData.contrasena}
+                                        onChange={handleChange}
+                                        onBlur={handlePasswordBlur}
+                                        required
+                                        maxLength="100"
+                                        placeholder="MÃ­nimo 8 caracteres"
+                                        aria-required="true"
+                                        aria-describedby="password-requirements"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="show-password-btn"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        aria-label={showPassword ? "Ocultar contraseÃ±a" : "Mostrar contraseÃ±a"}
+                                    >
+                                        {showPassword ? "Ocultar" : "Mostrar"}
+                                    </button>
+                                </div>
+                            </div>
 
-                    <div className="form-field">
-                        <label htmlFor="tiposociedadId">Tipo de Sociedad</label>
-                        <select
-                            id="tiposociedadId"
-                            name="tiposociedadId"
-                            value={empresaData.tiposociedadId}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Seleccione</option>
-                            {/* Añade aquí las opciones dinámicamente o estáticamente */}
-                        </select>
-                    </div>
+                            <div className="form-field">
+                                <label htmlFor="confirmarContrasena">Confirmar ContraseÃ±a*</label>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    id="confirmarContrasena"
+                                    name="confirmarContrasena"
+                                    value={empresaData.confirmarContrasena}
+                                    onChange={handleChange}
+                                    onBlur={handlePasswordBlur}
+                                    required
+                                    maxLength="100"
+                                    placeholder="Repita la contraseÃ±a"
+                                    aria-required="true"
+                                />
+                            </div>
+                        </div>
 
-                    <div className="form-field">
-                        <label htmlFor="actividadId">Actividad</label>
-                        <select
-                            id="actividadId"
-                            name="actividadId"
-                            value={empresaData.actividadId}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Seleccione</option>
-                            {/* Añade aquí las opciones dinámicamente o estáticamente */}
-                        </select>
-                    </div>
+                        {passwordError && (
+                            <div className="alert error-alert" role="alert">
+                                {passwordError}
+                            </div>
+                        )}
 
-                    <div className="form-field">
-                        <label htmlFor="regimenId">Régimen</label>
-                        <select
-                            id="regimenId"
-                            name="regimenId"
-                            value={empresaData.regimenId}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Seleccione</option>
-                            {/* Añade aquí las opciones dinámicamente o estáticamente */}
-                        </select>
-                    </div>
-
-                    <div className="form-field">
-                        <label htmlFor="contrasena">Contraseña</label>
-                        <input
-                            type="password"
-                            id="contrasena"
-                            name="contrasena"
-                            value={empresaData.contrasena}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-field">
-                        <label htmlFor="confirmarContrasena">Confirmar Contraseña</label>
-                        <input
-                            type="password"
-                            id="confirmarContrasena"
-                            name="confirmarContrasena"
-                            value={empresaData.confirmarContrasena}
-                            onChange={handleChange}
-                            required
-                        />
+                        <div className="password-requirements" id="password-requirements" aria-live="polite">
+                            <p>La contraseÃ±a debe contener:</p>
+                            <ul>
+                                <li className={passwordRequirements.length ? 'valid' : ''}>
+                                    {passwordRequirements.length ? 'âœ“' : 'â€¢'} MÃ­nimo 8 caracteres
+                                </li>
+                                <li className={passwordRequirements.uppercase ? 'valid' : ''}>
+                                    {passwordRequirements.uppercase ? 'âœ“' : 'â€¢'} Al menos una mayÃºscula
+                                </li>
+                                <li className={passwordRequirements.number ? 'valid' : ''}>
+                                    {passwordRequirements.number ? 'âœ“' : 'â€¢'} Al menos un nÃºmero
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div className="form-actions">
                         <button
                             type="submit"
                             className="primary-button"
-                            disabled={loading}
+                            disabled={loading || loadingData}
+                            aria-busy={loading}
                         >
-                            {loading ? 'Registrando...' : 'Registrarse'}
+                            {loading ? (
+                                <>
+                                    <span className="spinner" aria-hidden="true"></span>
+                                    Registrando...
+                                </>
+                            ) : 'Registrarse'}
                         </button>
                     </div>
                 </form>
 
                 <div className="auth-footer">
                     <p>
-                        ¿Ya tienes una cuenta?{' '}
-                        <button className="link-button" onClick={() => navigate('/login')}>
-                            Inicia sesión aquí
+                        Â¿Ya tienes una cuenta?{' '}
+                        <button
+                            type="button"
+                            className="link-button"
+                            onClick={() => navigate('/login')}
+                        >
+                            Inicia sesiÃ³n aquÃ­
                         </button>
                     </p>
                 </div>
@@ -217,3 +479,4 @@ const Register = () => {
 };
 
 export default Register;
+

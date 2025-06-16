@@ -23,14 +23,56 @@ namespace kratos.Server.Controllers
 
         [HttpPost]
         [Route("RegistroEmpresa")]
-        public async Task<IActionResult> RegistroEmpresa(Empresas empresas)
+        public async Task<IActionResult> RegistroEmpresa([FromBody] Empresas empresa)
         {
-            empresas.contrasena = Encriptar.EncriptarClave(empresas.contrasena);
-            empresas.confirmarContrasena = Encriptar.EncriptarClave(empresas.confirmarContrasena);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Errores de validación",
+                    errors = ModelState.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    )
+                });
+            }
 
-            await _context.Empresas.AddAsync(empresas);
-            await _context.SaveChangesAsync();
-            return Ok(empresas);
+            try
+            {
+                // Validar que las contraseñas coincidan (antes de encriptar)
+                if (empresa.contrasena != empresa.confirmarContrasena)
+                {
+                    return BadRequest(new { message = "Las contraseñas no coinciden" });
+                }
+
+                // Encriptar contraseñas
+                empresa.contrasena = Encriptar.EncriptarClave(empresa.contrasena);
+                empresa.confirmarContrasena = Encriptar.EncriptarClave(empresa.confirmarContrasena);
+
+                // Establecer fechas automáticamente
+                empresa.creadoEn = DateTime.Now;
+                empresa.actualizadoEn = DateTime.Now;
+
+                // Asegurar que el estado activo sea true por defecto
+                empresa.activo = true;
+
+                await _context.Empresas.AddAsync(empresa);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Empresa registrada exitosamente",
+                    empresaId = empresa.id
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error interno del servidor",
+                    details = ex.Message
+                });
+            }
         }
 
         [HttpGet]

@@ -13,7 +13,7 @@ import TiposSociedad from './pages/TiposSociedad';
 import Unauthorized from './pages/Unauthorized';
 import Inicio from './pages/Inicio'; // Importar la página de inicio
 import Register from './pages/Register';
-
+import Empresa from './pages/Empresa';
 function App() {
     return (
         <Router>
@@ -28,6 +28,7 @@ function App() {
                     <Route path="/unauthorized" element={<Unauthorized />} />
                     <Route path="/Home" element={<Home />} />
                     <Route path="/Regimenes" element={<Regimenes />} />
+                    <Route path="/Empresa" element={<Empresa />} />
                     <Route path="/TiposSociedad" element={<TiposSociedad />} />
                     {/* Rutas protegidas con MainLayout */}
                 

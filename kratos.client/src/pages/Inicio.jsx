@@ -12,7 +12,7 @@ function Inicio() {
           <p className="hero-subtitle">Tu solución integral para gestión y productividad</p>
           <div className="hero-buttons">
             <Link to="/login" className="btn btn-primary">Iniciar Sesión</Link>
-               <Link to="/Home" className="btn btn-primary">CRUD</Link>
+         
             <Link to="/register" className="btn btn-secondary">Registrarse</Link>
           </div>
         </div>
