@@ -190,6 +190,12 @@ const TiposSociedades = () => {
                     >
                         <span>Empresas</span>
                     </div>
+                                 <div
+                                                className={`menu-item ${isActive('/Usuarios') ? 'active' : ''}`}
+                                                onClick={() => navigate('/Usuarios')}
+                                        >
+                                                <span>Usuarios</span>
+                                        </div>
                 </div>
             </aside>
 
