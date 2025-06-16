@@ -40,32 +40,32 @@ class Empresas {
     validate() {
         const errors = [];
 
-        // Validación de contraseñas
+        // Validacion de contraseÃ±as
         if (!this.contrasena || this.contrasena.trim() === '') {
-            errors.push('El campo contraseña es obligatorio');
+            errors.push('El campo contraseÃ±a es obligatorio');
         }
         if (!this.confirmarContrasena || this.confirmarContrasena.trim() === '') {
-            errors.push('El campo confirmar contraseña es obligatorio');
+            errors.push('El campo confirmar contraseÃ±a es obligatorio');
         }
         if (this.contrasena && this.confirmarContrasena && this.contrasena !== this.confirmarContrasena) {
-            errors.push('La contraseña y la confirmación no coinciden');
+            errors.push('La contraseÃ±a y la confirmacion no coinciden');
         }
         if (this.contrasena && this.contrasena.length > 100) {
-            errors.push('La contraseña no puede exceder los 100 caracteres');
+            errors.push('La contraseÃ±a no puede exceder los 100 caracteres');
         }
 
-        // Validación de campos obligatorios
+        // Validacion de campos obligatorios
         const requiredFields = {
-            razonSocial: 'Razón Social',
-            email: 'Correo Electrónico',
+            razonSocial: 'Razon Social',
+            email: 'Correo Electronico',
             nit: 'NIT',
-            telefono: 'Teléfono',
+            telefono: 'Telefono',
             token: 'Token',
             nombreComercial: 'Nombre Comercial',
             representanteLegal: 'Representante Legal',
             tiposociedadId: 'Tipo de Sociedad',
-            actividadId: 'Actividad Económica',
-            regimenId: 'Régimen Tributario'
+            actividadId: 'Actividad Economica',
+            regimenId: 'Regimen Tributario'
         };
 
         Object.entries(requiredFields).forEach(([field, name]) => {
@@ -74,7 +74,7 @@ class Empresas {
             }
         });
 
-        // Validación de longitud máxima
+        // Validacion de longitud maxima
         const maxLengthFields = {
             razonSocial: 100,
             email: 100,
@@ -117,7 +117,7 @@ class Empresas {
             actualizadoEn: this.actualizadoEn
         };
 
-        // Solo incluir el ID si está definido
+        // Solo incluir el ID si esta definido
         if (this.id !== undefined) {
             jsonData.id = this.id;
         }
