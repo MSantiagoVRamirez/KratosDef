@@ -17,7 +17,7 @@ const Usuarios = () => {
                 confirmarContrasena: '',
                 token: '',
 
-                nombre: '',
+              
                 telefono: '',
                 email: '',
                 apellidos: '',
@@ -143,7 +143,6 @@ const Usuarios = () => {
                         confirmarContrasena: '',
                         token: '',
 
-                        nombre: '',
                         telefono: '',
                         email: '',
                         apellidos: '',

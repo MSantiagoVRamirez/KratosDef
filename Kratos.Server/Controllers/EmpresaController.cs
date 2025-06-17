@@ -44,8 +44,7 @@ namespace kratos.Server.Controllers
                 {
                     return BadRequest(new { message = "Las contraseñas no coinciden" });
                 }
-                var tokenOrigen = Token.GenerarToken();
-                empresa.token = Token.Encriptar(tokenOrigen);
+      
 
                 // Encriptar contraseñas
                 empresa.contrasena = Encriptar.EncriptarClave(empresa.contrasena);
@@ -65,7 +64,7 @@ namespace kratos.Server.Controllers
                 {
                     message = "Empresa registrada exitosamente",
                     empresaId = empresa.id
-                    token = tokenOrigen
+        
                 });
             }
             catch (Exception ex)
