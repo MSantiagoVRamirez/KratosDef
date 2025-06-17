@@ -5,9 +5,10 @@
     // 4. Asegurarse de que el nombre de la política coincida en ambos lugares.
 
     using kratos.Server.Services.Seguridad;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.AspNetCore.Authentication.Cookies;
     using Kratos.Server.Models;
+    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -24,10 +25,35 @@
             });
     });
 
-    builder.Services.AddDbContext<KratosContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<KratosContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    options.UseMySql(
+        connectionString,
+        new MySqlServerVersion(new Version(8, 0, 21)), // Versión de tu servidor MySQL
+        mysqlOptions =>
+        {
+            mysqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+
+            mysqlOptions.SchemaBehavior(MySqlSchemaBehavior.Translate,
+                (schema, entity) => $"{schema ?? "dbo"}_{entity}");
+
+            // Opcional: Configuración de logging
+            mysqlOptions.EnableStringComparisonTranslations();
+        });
+
+    // Opcional: Habilitar logging detallado
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableSensitiveDataLogging()
+               .EnableDetailedErrors();
+    }
+});
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
         {
             options.LoginPath = "/Login/IniciarSesion";
@@ -65,5 +91,11 @@
         app.MapOpenApi();
     }
 
-    app.Run();
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<KratosContext>();
+    dbContext.Database.Migrate();
+}
+app.Run();
     //https://localhost:7054/swagger/index.html// En tu Program.cs o Startup.cs

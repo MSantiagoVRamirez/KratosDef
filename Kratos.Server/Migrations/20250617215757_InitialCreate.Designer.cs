@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kratos.Server.Migrations
 {
     [DbContext(typeof(KratosContext))]
-    [Migration("20250613160845_003")]
-    partial class _003
+    [Migration("20250617215757_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,152 +21,176 @@ namespace Kratos.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.ActividadEconomicas", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("categoria")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("categoria");
 
                     b.Property<string>("codigoCiiu")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("codigo_ciiu");
 
                     b.Property<string>("descripcion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
 
                     b.Property<string>("nombre")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
                     b.HasKey("id");
 
-                    b.ToTable("ActividadEconomicas");
+                    b.ToTable("actividadeconomicas");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Categorias", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<bool>("activo")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("activo");
 
                     b.Property<DateTime>("actualizadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("actualizadoen");
 
-                    b.Property<int>("categoriapadreId")
-                        .HasColumnType("int");
+                    b.Property<int?>("categoriapadreId")
+                        .HasColumnType("int")
+                        .HasColumnName("categoriapadreid");
 
                     b.Property<DateTime>("creadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("creadoen");
 
                     b.Property<string>("descripcion")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("descripcion");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
                     b.HasKey("id");
 
                     b.HasIndex("categoriapadreId");
 
-                    b.ToTable("Categorias");
+                    b.ToTable("categorias");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Empresas", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<int>("actividadId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("actividadid");
 
                     b.Property<bool>("activo")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("activo");
 
                     b.Property<DateTime>("actualizadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date")
+                        .HasColumnName("actualizadoen");
 
                     b.Property<string>("confirmarContrasena")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("confirmarcontrasena");
 
                     b.Property<string>("contrasena")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("contrasena");
 
                     b.Property<DateTime>("creadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date")
+                        .HasColumnName("creadoen");
 
                     b.Property<string>("dv")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("dv");
 
                     b.Property<string>("email")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("email");
 
                     b.Property<string>("nit")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nit");
 
                     b.Property<string>("nombreComercial")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombrecomercial");
 
                     b.Property<string>("razonSocial")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("razonsocial");
 
                     b.Property<int>("regimenId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("regimenid");
 
                     b.Property<string>("representanteLegal")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("representantelegal");
 
                     b.Property<string>("telefono")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("telefono");
 
                     b.Property<int>("tiposociedadId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("tiposociedadid");
 
                     b.Property<string>("token")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("token");
 
                     b.HasKey("id");
 
@@ -176,45 +200,53 @@ namespace Kratos.Server.Migrations
 
                     b.HasIndex("tiposociedadId");
 
-                    b.ToTable("Empresas");
+                    b.ToTable("empresas");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Impuestos", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<int>("actividadId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("actividadid");
 
                     b.Property<string>("codigo")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("codigo");
 
                     b.Property<string>("descripcion")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("descripcion");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
                     b.Property<string>("porcentaje")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("porcentaje");
 
                     b.Property<int>("regimenId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("regimenid");
 
                     b.Property<int>("sociedadesId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("sociedadesid");
 
                     b.HasKey("id");
 
@@ -224,31 +256,37 @@ namespace Kratos.Server.Migrations
 
                     b.HasIndex("sociedadesId");
 
-                    b.ToTable("Impuestos");
+                    b.ToTable("impuestos");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Inventarios", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<DateTime>("actualizadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("actualizadoen");
 
                     b.Property<int>("cantidad")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("cantidad");
 
                     b.Property<DateTime>("creadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("creadoen");
 
                     b.Property<int>("productoId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("productoid");
 
                     b.Property<int>("puntoventaId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("puntoventaid");
 
                     b.HasKey("id");
 
@@ -256,138 +294,168 @@ namespace Kratos.Server.Migrations
 
                     b.HasIndex("puntoventaId");
 
-                    b.ToTable("Inventarios");
+                    b.ToTable("inventarios");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Modulos", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
                     b.HasKey("id");
 
-                    b.ToTable("Modulos");
+                    b.ToTable("modulos");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Permisos", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("codigo")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("codigo");
 
                     b.Property<bool>("consultar")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("consultar");
 
                     b.Property<string>("descripcion")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("descripcion");
 
                     b.Property<bool>("editar")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("editar");
 
                     b.Property<bool>("eliminar")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("eliminar");
 
                     b.Property<bool>("exportar")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("exportar");
 
                     b.Property<bool>("importar")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("importar");
 
                     b.Property<bool>("insertar")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("insertar");
 
                     b.Property<bool>("leer")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("leer");
 
                     b.Property<int>("modulosId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("modulosid");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
+
+                    b.Property<int?>("permisos")
+                        .HasColumnType("int");
 
                     b.Property<int>("rolesId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("rolesid");
 
                     b.HasKey("id");
 
                     b.HasIndex("modulosId");
 
+                    b.HasIndex("permisos");
+
                     b.HasIndex("rolesId");
 
-                    b.ToTable("Permisos");
+                    b.ToTable("permisos");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Productos", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int?>("CategoriaId")
+                        .HasColumnType("int")
+                        .HasColumnName("categoriaid");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("codigo");
 
                     b.Property<bool>("activo")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("activo");
 
                     b.Property<DateTime>("actualizadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("actualizado_en");
 
                     b.Property<int>("categoriaId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("categoria_id");
 
-                    b.Property<string>("codigo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("costo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<decimal>("costo")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("costo");
 
                     b.Property<DateTime>("creadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("creado_en");
 
                     b.Property<string>("descripcion")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("descripcion");
 
                     b.Property<int>("impuestoId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("impuestoid");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
-                    b.Property<string>("precio")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<decimal>("precio")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("precio");
 
-                    b.Property<string>("stockMinimo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("stockMinimo")
+                        .HasColumnType("int")
+                        .HasColumnName("stock_minimo");
 
                     b.HasKey("id");
 
@@ -395,156 +463,185 @@ namespace Kratos.Server.Migrations
 
                     b.HasIndex("impuestoId");
 
-                    b.ToTable("Productos");
+                    b.ToTable("productos");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.PuntoVentas", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int?>("Usuariosid")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
                     b.Property<bool>("activo")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("activo");
 
                     b.Property<DateTime>("actualizadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("actualizadoen");
 
                     b.Property<DateTime>("creadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("creadoen");
 
                     b.Property<string>("direccion")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("direccion");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
                     b.Property<int>("responsableId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("responsableid");
 
                     b.Property<string>("telefono")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("telefono");
 
                     b.HasKey("id");
 
+                    b.HasIndex("Usuariosid");
+
                     b.HasIndex("responsableId");
 
-                    b.ToTable("PuntoVentas");
+                    b.ToTable("puntoventas");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.RegimenesTributarios", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("codigo")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("codigo");
 
                     b.Property<string>("descripcion")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("descripcion");
 
                     b.Property<bool>("estado")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("estado");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
                     b.HasKey("id");
 
-                    b.ToTable("RegimenesTributarios");
+                    b.ToTable("regimenestributarios");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Roles", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("descripcion")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("descripcion");
 
                     b.Property<int>("empresaId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("empresaid");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
                     b.HasKey("id");
 
                     b.HasIndex("empresaId");
 
-                    b.ToTable("Roles");
+                    b.ToTable("roles");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.TiposSociedades", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("codigo")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("codigo");
 
                     b.Property<string>("descripcion")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("descripcion");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombre");
 
-                    b.HasKey("Id");
+                    b.HasKey("id");
 
-                    b.ToTable("TiposSociedades");
+                    b.ToTable("tipossociedades");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.TratamientosEmpresas", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<int>("empresaId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("empresaid");
 
-                    b.Property<string>("porcentaje")
-                        .IsRequired()
+                    b.Property<decimal>("porcentaje")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("porcentaje");
 
                     b.Property<int>("tipoimpuestoId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("tipoimpuestoid");
 
                     b.HasKey("id");
 
@@ -552,78 +649,89 @@ namespace Kratos.Server.Migrations
 
                     b.HasIndex("tipoimpuestoId");
 
-                    b.ToTable("TratamientosEmpresas");
+                    b.ToTable("tratamientosempresas");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Usuarios", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
                     b.Property<DateTime>("actualizadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("actualizadoen");
 
                     b.Property<string>("apellidos")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("apellidos");
 
-                    b.Property<string>("confirmarContraseña")
+                    b.Property<string>("confirmarContrasena")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("confirmarcontrasena");
 
-                    b.Property<string>("contraseña")
+                    b.Property<string>("contrasena")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("contrasena");
 
                     b.Property<DateTime>("creadoEn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("creadoen");
 
                     b.Property<string>("email")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("email");
 
                     b.Property<bool>("estado")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("estado");
 
-                    b.Property<string>("nombres")
+                    b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nombres");
 
                     b.Property<int>("rolesId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("rolesid");
 
                     b.Property<string>("telefono")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("telefono");
 
                     b.Property<string>("token")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("token");
 
                     b.HasKey("id");
 
                     b.HasIndex("rolesId");
 
-                    b.ToTable("Usuarios");
+                    b.ToTable("usuarios");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Categorias", b =>
                 {
                     b.HasOne("kratos.Server.Models.Kratos.Categorias", "categoriapadreFk")
-                        .WithMany()
+                        .WithMany("Subcategorias")
                         .HasForeignKey("categoriapadreId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("categoriapadreFk");
                 });
@@ -711,6 +819,10 @@ namespace Kratos.Server.Migrations
 
                     b.HasOne("kratos.Server.Models.Kratos.Roles", "permisosrolesId")
                         .WithMany()
+                        .HasForeignKey("permisos");
+
+                    b.HasOne("kratos.Server.Models.Kratos.Roles", "rol")
+                        .WithMany("Permisos")
                         .HasForeignKey("rolesId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -718,6 +830,8 @@ namespace Kratos.Server.Migrations
                     b.Navigation("permisosmodulosId");
 
                     b.Navigation("permisosrolesId");
+
+                    b.Navigation("rol");
                 });
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.Productos", b =>
@@ -741,6 +855,10 @@ namespace Kratos.Server.Migrations
 
             modelBuilder.Entity("kratos.Server.Models.Kratos.PuntoVentas", b =>
                 {
+                    b.HasOne("kratos.Server.Models.Kratos.Usuarios", null)
+                        .WithMany("PuntosVenta")
+                        .HasForeignKey("Usuariosid");
+
                     b.HasOne("kratos.Server.Models.Kratos.Usuarios", "usuarioFk")
                         .WithMany()
                         .HasForeignKey("responsableId")
@@ -789,6 +907,21 @@ namespace Kratos.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("usuariosrolesFk");
+                });
+
+            modelBuilder.Entity("kratos.Server.Models.Kratos.Categorias", b =>
+                {
+                    b.Navigation("Subcategorias");
+                });
+
+            modelBuilder.Entity("kratos.Server.Models.Kratos.Roles", b =>
+                {
+                    b.Navigation("Permisos");
+                });
+
+            modelBuilder.Entity("kratos.Server.Models.Kratos.Usuarios", b =>
+                {
+                    b.Navigation("PuntosVenta");
                 });
 #pragma warning restore 612, 618
         }

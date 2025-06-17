@@ -44,7 +44,7 @@ namespace kratos.Server.Controllers
         [Route("Consultar")]
         public async Task<TiposSociedades?> Consultar(int id)
         {
-            var tipoSociedad = await _context.TiposSociedades.FirstOrDefaultAsync(t => t.Id == id);
+            var tipoSociedad = await _context.TiposSociedades.FirstOrDefaultAsync(t => t.id == id);
             return tipoSociedad;
         }
 
@@ -52,7 +52,7 @@ namespace kratos.Server.Controllers
         [Route("Actualizar")]
         public async Task<IActionResult> Actualizar(TiposSociedades tipoSociedad)
         {
-            var tipoSociedadExistente = await _context.TiposSociedades.FirstOrDefaultAsync(t => t.Id == tipoSociedad.Id);
+            var tipoSociedadExistente = await _context.TiposSociedades.FirstOrDefaultAsync(t => t.id == tipoSociedad.id);
             if (tipoSociedadExistente == null)
             {
                 return BadRequest();

@@ -2,7 +2,9 @@
 using kratos.Server.Models.Kratos;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-
+using Microsoft.EntityFrameworkCore;
+using kratos.Server.Models.Kratos;
+using System.Collections.Generic;
 
 namespace Kratos.Server.Models
 {
@@ -29,7 +31,17 @@ namespace Kratos.Server.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                // Reemplazar nombres de tabla para usar snake_case (opcional pero común en MySQL)
+                entity.SetTableName(entity.GetTableName().ToLower());
 
+                foreach (var property in entity.GetProperties())
+                {
+                    // Reemplazar nombres de columnas para usar snake_case
+                    property.SetColumnName(property.GetColumnBaseName().ToLower());
+                }
+            }
             // Empresas -> TiposSociedades
             modelBuilder.Entity<Empresas>()
                 .HasOne(e => e.empresasociedadFk)
@@ -109,11 +121,10 @@ namespace Kratos.Server.Models
 
             // Permisos -> Roles
             modelBuilder.Entity<Permisos>()
-                .HasOne(p => p.permisosrolesId)
-                .WithMany()
-                .HasForeignKey(p => p.rolesId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+                     .HasOne(p => p.rol)  // Asegúrate que esta propiedad existe en Permisos
+                     .WithMany(r => r.Permisos)  // Asegúrate que esta propiedad existe en Roles
+                     .HasForeignKey(p => p.rolesId)
+                     .OnDelete(DeleteBehavior.Restrict);
             // Permisos -> Modulos
             modelBuilder.Entity<Permisos>()
                 .HasOne(p => p.permisosmodulosId)
@@ -152,7 +163,7 @@ namespace Kratos.Server.Models
             // Categorias -> Categorias (self reference)
             modelBuilder.Entity<Categorias>()
                 .HasOne(c => c.categoriapadreFk)
-                .WithMany()
+                .WithMany(c => c.Subcategorias)
                 .HasForeignKey(c => c.categoriapadreId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

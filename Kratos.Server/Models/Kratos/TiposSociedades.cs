@@ -1,27 +1,29 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace kratos.Server.Models.Kratos
 {
+    [Table("TiposSociedades")]  // Explicit snake_case table name
     public class TiposSociedades
     {
-        public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("id")]
+        public int id { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
-        public string codigo { get; set; }
-
+        [Column("codigo", TypeName = "varchar(100)")]
+        public string codigo { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
-        public string nombre { get; set; }
-
+        [Column("nombre", TypeName = "varchar(100)")]
+        public string nombre { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(500, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
-        public string descripcion { get; set; }
-    
-       }
-       
-     
+        [Column("descripcion", TypeName = "varchar(500)")]
+        public string descripcion { get; set; } = string.Empty;
     }
-
+}
