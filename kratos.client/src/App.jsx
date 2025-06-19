@@ -14,7 +14,7 @@ import Unauthorized from './pages/Unauthorized';
 import Inicio from './pages/Inicio'; 
 import Register from './pages/Register';
 import Empresa from './pages/Empresa';
-
+import Usuarios from './pages/Usuarios';
 
 function App() {
     return (
@@ -27,6 +27,7 @@ function App() {
                 
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/Usuarios" element={<Usuarios />} />
                     <Route path="/Dashboard" element={<Dashboard />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
                     <Route path="/Home" element={<Home />} />

@@ -12,16 +12,23 @@ const getAll = async () => {
         throw error;
     }
 };
-
 const create = async (actividadData) => {
     try {
-        const actividad = new ActividadEconomica(actividadData);
-        actividad.validate();
+        // Destructure to remove id without assigning it to a variable
+        const { id: _, ...dataToSend } = actividadData;
 
-        const response = await axios.post(`${ENDPOINT}/insertar`, actividad.toJSON());
-        return new ActividadEconomica(response.data);
+        const response = await axios.post(`${ENDPOINT}/insertar`, dataToSend, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
     } catch (error) {
-        console.error('Error creating actividad:', error.response?.data || error.message);
+        console.error('Error creating actividad:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        });
         throw error;
     }
 };

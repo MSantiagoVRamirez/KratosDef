@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Kratos.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Cambios001 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,7 +27,7 @@ namespace Kratos.Server.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     categoria = table.Column<string>(type: "varchar(50)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    codigo_ciiu = table.Column<string>(type: "varchar(20)", nullable: true)
+                    codigociiu = table.Column<string>(type: "varchar(20)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>

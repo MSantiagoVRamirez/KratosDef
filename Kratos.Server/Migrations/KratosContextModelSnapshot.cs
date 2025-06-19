@@ -37,7 +37,7 @@ namespace Kratos.Server.Migrations
 
                     b.Property<string>("codigoCiiu")
                         .HasColumnType("varchar(20)")
-                        .HasColumnName("codigo_ciiu");
+                        .HasColumnName("codigociiu");
 
                     b.Property<string>("descripcion")
                         .HasColumnType("text")

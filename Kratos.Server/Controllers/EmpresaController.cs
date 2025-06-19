@@ -22,9 +22,8 @@ namespace kratos.Server.Controllers
         }
 
         // EmpresaController.cs
-        [HttpPost]
-        [Route("RegistroEmpresa")]
-        public async Task<IActionResult> RegistroEmpresa([FromBody] Empresas empresa)
+        [HttpPost("insertar")]  // This must match your frontend call
+        public async Task<IActionResult> InsertarEmpresa([FromBody] Empresas empresa)
         {
             if (!ModelState.IsValid)
             {
@@ -84,7 +83,7 @@ namespace kratos.Server.Controllers
         }
 
         [HttpPut]
-        [Route("ActualizarEmpresa")]
+        [Route("editar")]
         public async Task<IActionResult> ActualizarEmpresa([FromBody] Empresas empresa)
         {
             try
@@ -161,7 +160,7 @@ namespace kratos.Server.Controllers
         }
 
         [HttpDelete]
-        [Route("EliminarEmpresa/{id}")]
+        [Route("Eliminar/{id}")]
         public async Task<IActionResult> EliminarEmpresa(int id)
         {
             try

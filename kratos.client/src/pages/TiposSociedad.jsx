@@ -167,6 +167,12 @@ const TiposSociedades = () => {
             <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
                 <div className="sidebar-menu">
                     <div
+                        className={`menu-item ${isActive('/Dashboard') ? 'active' : ''}`}
+                        onClick={() => navigate('/Dashboard')}
+                    >
+                        <span>Dashboard</span>
+                    </div>
+                    <div
                         className={`menu-item ${isActive('/Home') ? 'active' : ''}`}
                         onClick={() => navigate('/Home')}
                     >

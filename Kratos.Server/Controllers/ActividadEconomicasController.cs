@@ -20,16 +20,20 @@ namespace kratos.Server.Controllers
             _context = context;
         }
 
-        [HttpPost]
-        [Route("insertar")]
-        public async Task<IActionResult> Insertar([FromBody] ActividadEconomicas actividad)
+     
+        [HttpPost("insertar")]
+        public async Task<IActionResult> Insert([FromBody] ActividadEconomicas model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            await _context.ActividadEconomicas.AddAsync(actividad);
+            _context.ActividadEconomicas.Add(model);
             await _context.SaveChangesAsync();
-            return Ok(actividad);
-        }
 
+            return Ok(model);
+        }
         [HttpGet]
         [Route("leer")]
         public async Task<List<ActividadEconomicas>> Leer()

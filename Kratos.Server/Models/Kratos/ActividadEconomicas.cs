@@ -13,17 +13,17 @@ namespace kratos.Server.Models.Kratos
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
 
-        [Required]
+      
         [Column("nombre", TypeName = "varchar(100)")]
         public string nombre { get; set; }
 
-        [Column("descripcion", TypeName = "text")]
+        [Column("descripcion", TypeName = "varchar(500)")]
         public string? descripcion { get; set; }
 
         [Column("categoria", TypeName = "varchar(50)")]
         public string? categoria { get; set; }
 
-        [Column("codigo_ciiu", TypeName = "varchar(20)")]
+        [Column("codigoCiiu", TypeName = "varchar(20)")]
         public string? codigoCiiu { get; set; }
     }
 }

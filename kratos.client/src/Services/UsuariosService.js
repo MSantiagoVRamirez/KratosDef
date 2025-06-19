@@ -3,7 +3,7 @@ import axios from '../api/axios';
 const ENDPOINT = 'Usuarios';
 
 const empresaService = {
-    registroEmpresa: async (empresaData) => {
+   create: async (empresaData) => {
         try {
             // Destructure to remove id without triggering unused var warning
             const { id: _id, ...dataToSend } = empresaData;
@@ -20,9 +20,9 @@ const empresaService = {
         }
     },
 
-    listarEmpresas: async () => {
+   getAll: async () => {
         try {
-            const response = await axios.get(`${ENDPOINT}/ListarEmpresas`);
+            const response = await axios.get(`${ENDPOINT}/Listar`);
             return response.data;
         } catch (error) {
             console.error('Error al listar empresas:', error.response?.data || error.message);
@@ -30,9 +30,9 @@ const empresaService = {
         }
     },
 
-    consultarEmpresa: async (id) => {
+    consult: async (id) => {
         try {
-            const response = await axios.get(`${ENDPOINT}/ConsultarEmpresa`, {
+            const response = await axios.get(`${ENDPOINT}/Consultar`, {
                 params: { id }
             });
             return response.data;
@@ -42,9 +42,9 @@ const empresaService = {
         }
     },
 
-    actualizarEmpresa: async (empresaData) => {
+   update: async (empresaData) => {
         try {
-            const response = await axios.put(`${ENDPOINT}/ActualizarEmpresa`, empresaData);
+            const response = await axios.put(`${ENDPOINT}/Actualizar`, empresaData);
             return response.data;
         } catch (error) {
             console.error('Error al actualizar empresa:', error.response?.data || error.message);
@@ -52,9 +52,9 @@ const empresaService = {
         }
     },
 
-    eliminarEmpresa: async (id) => {
+  remove: async (id) => {
         try {
-            const response = await axios.delete(`${ENDPOINT}/EliminarEmpresa`, {
+            const response = await axios.delete(`${ENDPOINT}/Eliminar`, {
                 params: { id }
             });
             return response.data;

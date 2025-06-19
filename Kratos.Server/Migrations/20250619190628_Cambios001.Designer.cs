@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kratos.Server.Migrations
 {
     [DbContext(typeof(KratosContext))]
-    [Migration("20250619030747_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250619190628_Cambios001")]
+    partial class Cambios001
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,7 +40,7 @@ namespace Kratos.Server.Migrations
 
                     b.Property<string>("codigoCiiu")
                         .HasColumnType("varchar(20)")
-                        .HasColumnName("codigo_ciiu");
+                        .HasColumnName("codigociiu");
 
                     b.Property<string>("descripcion")
                         .HasColumnType("text")

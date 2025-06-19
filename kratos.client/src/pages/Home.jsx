@@ -7,7 +7,7 @@ import './Home.css';
 const Home = () => {
     const [actividades, setActividades] = useState([]);
     const [currentActividad, setCurrentActividad] = useState({
-        id: 0,
+        id: null,
         codigoCiiu: '',
         nombre: '',
         descripcion: '',
@@ -79,19 +79,29 @@ const Home = () => {
         setLoading(true);
 
         try {
+            // Create a clean payload without the id when creating new
+            const payload = isEditing ? currentActividad : {
+                codigoCiiu: currentActividad.codigoCiiu,
+                nombre: currentActividad.nombre,
+                descripcion: currentActividad.descripcion,
+                categoria: currentActividad.categoria
+            };
+
             if (isEditing) {
-                await ActividadEconomicaService.update(currentActividad);
+                await ActividadEconomicaService.update(payload);
                 setSuccess('Actividad económica actualizada exitosamente');
             } else {
-                await ActividadEconomicaService.create(currentActividad);
+                await ActividadEconomicaService.create(payload);
                 setSuccess('Actividad económica creada exitosamente');
             }
             resetForm();
             await fetchActividades();
         } catch (err) {
-            const errorMsg = err.response?.data?.message || 'Error al procesar la solicitud';
+            const errorMsg = err.response?.data?.message ||
+                err.response?.data?.title ||
+                'Error al procesar la solicitud';
             setError(errorMsg);
-            console.error(err);
+            console.error('Detailed error:', err.response?.data || err);
         } finally {
             setLoading(false);
         }
@@ -121,7 +131,7 @@ const Home = () => {
 
     const resetForm = () => {
         setCurrentActividad({
-            id: 0,
+            id: null,
             codigoCiiu: '',
             nombre: '',
             descripcion: '',
@@ -171,6 +181,12 @@ const Home = () => {
             {/* Sidebar */}
             <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
                 <div className="sidebar-menu">
+                    <div
+                        className={`menu-item ${isActive('/Dashboard') ? 'active' : ''}`}
+                        onClick={() => navigate('/Dashboard')}
+                    >
+                        <span>Dashboard</span>
+                    </div>
                     <div
                         className={`menu-item ${isActive('/Home') ? 'active' : ''}`}
                         onClick={() => navigate('/Home')}
