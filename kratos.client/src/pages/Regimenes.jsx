@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import RegimenTributarioService from '../Services/RegimenesTributariosService';
-import authService from '../services/IniciarSesion'; // Importa el servicio de autenticación
+import authService from '../services/IniciarSesion';
 import './Home.css';
 
 const Regimenes = () => {
@@ -10,10 +10,15 @@ const Regimenes = () => {
         id: 0,
         codigo: '',
         nombre: '',
-        descripcion: ''
+        descripcion: '',
+        estado: true
     });
     const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState({
+        list: false,
+        form: false,
+        actions: false
+    });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -25,7 +30,7 @@ const Regimenes = () => {
     }, []);
 
     const fetchRegimenes = async () => {
-        setLoading(true);
+        setLoading(prev => ({ ...prev, list: true }));
         setError(null);
         try {
             const data = await RegimenTributarioService.getAll();
@@ -35,15 +40,15 @@ const Regimenes = () => {
             console.error(err);
             setRegimenes([]);
         } finally {
-            setLoading(false);
+            setLoading(prev => ({ ...prev, list: false }));
         }
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setCurrentRegimen({
             ...currentRegimen,
-            [name]: value
+            [name]: type === 'checkbox' ? checked : value
         });
     };
 
@@ -51,13 +56,22 @@ const Regimenes = () => {
         const errors = [];
         if (!currentRegimen.codigo || currentRegimen.codigo.trim() === '') {
             errors.push('El código es requerido');
+        } else if (currentRegimen.codigo.length > 100) {
+            errors.push('El código no debe exceder 100 caracteres');
         }
+
         if (!currentRegimen.nombre || currentRegimen.nombre.trim() === '') {
             errors.push('El nombre es obligatorio');
+        } else if (currentRegimen.nombre.length > 100) {
+            errors.push('El nombre no debe exceder 100 caracteres');
         }
+
         if (!currentRegimen.descripcion || currentRegimen.descripcion.trim() === '') {
             errors.push('La descripción es obligatoria');
+        } else if (currentRegimen.descripcion.length > 100) {
+            errors.push('La descripción no debe exceder 100 caracteres');
         }
+
         return errors;
     };
 
@@ -72,7 +86,7 @@ const Regimenes = () => {
             return;
         }
 
-        setLoading(true);
+        setLoading(prev => ({ ...prev, form: true }));
 
         try {
             if (isEditing) {
@@ -85,16 +99,22 @@ const Regimenes = () => {
             resetForm();
             await fetchRegimenes();
         } catch (err) {
-            const errorMsg = err.response?.data?.message || 'Error al procesar la solicitud';
+            const errorMsg = err.response?.data || err.message || 'Error al procesar la solicitud';
             setError(errorMsg);
             console.error(err);
         } finally {
-            setLoading(false);
+            setLoading(prev => ({ ...prev, form: false }));
         }
     };
 
     const editRegimen = (regimen) => {
-        setCurrentRegimen(regimen);
+        setCurrentRegimen({
+            id: regimen.id,
+            codigo: regimen.codigo,
+            nombre: regimen.nombre,
+            descripcion: regimen.descripcion,
+            estado: regimen.estado
+        });
         setIsEditing(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -102,7 +122,8 @@ const Regimenes = () => {
     const deleteRegimen = async (id) => {
         if (!window.confirm('¿Está seguro de eliminar este régimen tributario?')) return;
 
-        setLoading(true);
+        setLoading(prev => ({ ...prev, actions: true }));
+        setError(null);
         try {
             await RegimenTributarioService.remove(id);
             setSuccess('Régimen tributario eliminado exitosamente');
@@ -111,7 +132,34 @@ const Regimenes = () => {
             setError('Error al eliminar el régimen tributario');
             console.error(err);
         } finally {
-            setLoading(false);
+            setLoading(prev => ({ ...prev, actions: false }));
+        }
+    };
+
+    const toggleRegimenStatus = async (id, currentStatus) => {
+        if (!window.confirm(`¿Está seguro de ${currentStatus ? 'desactivar' : 'activar'} este régimen tributario?`)) return;
+
+        setLoading(prev => ({ ...prev, actions: true }));
+        setError(null);
+        try {
+            const regimenToUpdate = regimenes.find(r => r.id === id);
+            if (!regimenToUpdate) {
+                throw new Error('Régimen no encontrado');
+            }
+
+            const updatedRegimen = {
+                ...regimenToUpdate,
+                estado: !currentStatus
+            };
+
+            await RegimenTributarioService.update(updatedRegimen);
+            setSuccess(`Régimen tributario ${currentStatus ? 'desactivado' : 'activado'} exitosamente`);
+            await fetchRegimenes();
+        } catch (err) {
+            setError(`Error al ${currentStatus ? 'desactivar' : 'activar'} el régimen tributario`);
+            console.error(err);
+        } finally {
+            setLoading(prev => ({ ...prev, actions: false }));
         }
     };
 
@@ -120,7 +168,8 @@ const Regimenes = () => {
             id: 0,
             codigo: '',
             nombre: '',
-            descripcion: ''
+            descripcion: '',
+            estado: true
         });
         setIsEditing(false);
     };
@@ -136,7 +185,7 @@ const Regimenes = () => {
     const handleLogout = async () => {
         try {
             await authService.cerrarSesion();
-            navigate('/login'); // Redirige a la página de inicio de sesión
+            navigate('/login');
         } catch (error) {
             setError('Error al cerrar sesión');
             console.error(error);
@@ -190,12 +239,12 @@ const Regimenes = () => {
                     >
                         <span>Empresas</span>
                     </div>
-                                 <div
-                                                className={`menu-item ${isActive('/Usuarios') ? 'active' : ''}`}
-                                                onClick={() => navigate('/Usuarios')}
-                                        >
-                                                <span>Usuarios</span>
-                                        </div>
+                    <div
+                        className={`menu-item ${isActive('/Usuarios') ? 'active' : ''}`}
+                        onClick={() => navigate('/Usuarios')}
+                    >
+                        <span>Usuarios</span>
+                    </div>
                 </div>
             </aside>
 
@@ -226,7 +275,7 @@ const Regimenes = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="form-vertical">
                                 <div className="form-group">
-                                    <label htmlFor="codigo">Código</label>
+                                    <label htmlFor="codigo">Código *</label>
                                     <input
                                         type="text"
                                         id="codigo"
@@ -234,10 +283,13 @@ const Regimenes = () => {
                                         value={currentRegimen.codigo}
                                         onChange={handleInputChange}
                                         required
+                                        maxLength={100}
+                                        disabled={isEditing}
+                                        className={isEditing ? 'disabled-input' : ''}
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="nombre">Nombre</label>
+                                    <label htmlFor="nombre">Nombre *</label>
                                     <input
                                         type="text"
                                         id="nombre"
@@ -245,17 +297,34 @@ const Regimenes = () => {
                                         value={currentRegimen.nombre}
                                         onChange={handleInputChange}
                                         required
+                                        maxLength={100}
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="descripcion">Descripción</label>
+                                    <label htmlFor="descripcion">Descripción *</label>
                                     <textarea
                                         id="descripcion"
                                         name="descripcion"
                                         value={currentRegimen.descripcion}
                                         onChange={handleInputChange}
                                         required
+                                        maxLength={100}
+                                        rows="4"
                                     />
+                                </div>
+                                <div className="form-group checkbox-group">
+                                    <label htmlFor="estado">Estado:</label>
+                                    <input
+                                        type="checkbox"
+                                        id="estado"
+                                        name="estado"
+                                        checked={currentRegimen.estado}
+                                        onChange={handleInputChange}
+                                        disabled={!isEditing}
+                                    />
+                                    <span className={!isEditing ? 'disabled-text' : ''}>
+                                        {currentRegimen.estado ? 'Activo' : 'Inactivo'}
+                                    </span>
                                 </div>
                             </div>
                             <div className="form-actions">
@@ -264,7 +333,7 @@ const Regimenes = () => {
                                         type="button"
                                         className="button secondary"
                                         onClick={resetForm}
-                                        disabled={loading}
+                                        disabled={loading.form || loading.actions}
                                     >
                                         Cancelar
                                     </button>
@@ -272,9 +341,9 @@ const Regimenes = () => {
                                 <button
                                     type="submit"
                                     className="button primary"
-                                    disabled={loading}
+                                    disabled={loading.form || loading.actions}
                                 >
-                                    {loading ? 'Procesando...' : (isEditing ? 'Actualizar' : 'Guardar')}
+                                    {loading.form ? 'Procesando...' : (isEditing ? 'Actualizar' : 'Guardar')}
                                 </button>
                             </div>
                         </form>
@@ -283,7 +352,7 @@ const Regimenes = () => {
                     {/* Listado */}
                     <div className="list-section">
                         <h3 className="section-title">Listado de Regímenes</h3>
-                        {loading ? (
+                        {loading.list ? (
                             <div className="loading-state">
                                 <div className="spinner"></div>
                                 <p>Cargando regímenes...</p>
@@ -300,12 +369,13 @@ const Regimenes = () => {
                                             <th>Código</th>
                                             <th>Nombre</th>
                                             <th>Descripción</th>
+                                            <th>Estado</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {regimenes.map((regimen) => (
-                                            <tr key={regimen.id}>
+                                            <tr key={regimen.id} className={!regimen.estado ? 'inactive-row' : ''}>
                                                 <td>{regimen.codigo}</td>
                                                 <td>{regimen.nombre}</td>
                                                 <td>
@@ -313,18 +383,30 @@ const Regimenes = () => {
                                                         ? `${regimen.descripcion.substring(0, 50)}...`
                                                         : regimen.descripcion}
                                                 </td>
+                                                <td>
+                                                    <span className={`status-badge ${regimen.estado ? 'active' : 'inactive'}`}>
+                                                        {regimen.estado ? 'Activo' : 'Inactivo'}
+                                                    </span>
+                                                </td>
                                                 <td className="actions-cell">
                                                     <button
                                                         className="table-button edit"
                                                         onClick={() => editRegimen(regimen)}
-                                                        disabled={loading}
+                                                        disabled={loading.actions}
                                                     >
                                                         Editar
                                                     </button>
                                                     <button
+                                                        className={`table-button ${regimen.estado ? 'deactivate' : 'activate'}`}
+                                                        onClick={() => toggleRegimenStatus(regimen.id, regimen.estado)}
+                                                        disabled={loading.actions}
+                                                    >
+                                                        {regimen.estado ? 'Desactivar' : 'Activar'}
+                                                    </button>
+                                                    <button
                                                         className="table-button delete"
                                                         onClick={() => deleteRegimen(regimen.id)}
-                                                        disabled={loading}
+                                                        disabled={loading.actions}
                                                     >
                                                         Eliminar
                                                     </button>

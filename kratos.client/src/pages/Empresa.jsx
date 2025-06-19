@@ -93,24 +93,86 @@ const Empresas = () => {
 
     const validateForm = () => {
         const errors = [];
-        if (!currentEmpresa.razonSocial.trim()) errors.push('Razón social es requerida');
-        if (!currentEmpresa.nombreComercial.trim()) errors.push('Nombre comercial es obligatorio');
-        if (!currentEmpresa.nit.trim()) errors.push('NIT es obligatorio');
+        const { razonSocial, nombreComercial, nit, contrasena, confirmarContrasena, email } = currentEmpresa;
 
-        // Solo validar contraseñas si no estamos editando
-        if (!isEditing) {
-            if (!currentEmpresa.contrasena) errors.push('Contraseña es requerida');
-            if (currentEmpresa.contrasena !== currentEmpresa.confirmarContrasena) {
+        // Validaciones básicas
+        if (!razonSocial.trim()) errors.push('Razón social es requerida');
+        if (!nombreComercial.trim()) errors.push('Nombre comercial es obligatorio');
+        if (!nit.trim()) errors.push('NIT es obligatorio');
+
+        // Validar formato de email si se proporciona
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errors.push('El email no tiene un formato válido');
+        }
+
+        // Validar contraseñas solo para registro o si se están cambiando
+        if (!isEditing || contrasena) {
+            if (!contrasena) errors.push('Contraseña es requerida');
+            else if (contrasena.length < 8) errors.push('La contraseña debe tener al menos 8 caracteres');
+
+            if (contrasena !== confirmarContrasena) {
                 errors.push('Las contraseñas no coinciden');
             }
         }
+
         return errors;
+    };
+
+    const handleRegister = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            // Crear copia del objeto sin confirmarContrasena
+            const empresaData = {
+                ...currentEmpresa,
+                confirmarContrasena: undefined // No se envía al backend
+            };
+            delete empresaData.confirmarContrasena; // Eliminar el campo
+
+            await empresaService.registroEmpresa(empresaData);
+
+            setSuccess('Empresa registrada correctamente');
+            resetForm();
+            await fetchEmpresas();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdate = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            // Crear copia del objeto
+            const empresaData = { ...currentEmpresa };
+
+            // Eliminar campos de contraseña si no se modificaron
+            if (!empresaData.contrasena) {
+                delete empresaData.contrasena;
+                delete empresaData.confirmarContrasena;
+            } else {
+                // Si se modificó la contraseña, eliminar solo confirmarContrasena
+                delete empresaData.confirmarContrasena;
+            }
+
+            await empresaService.actualizarEmpresa(empresaData);
+
+            setSuccess('Empresa actualizada correctamente');
+            resetForm();
+            await fetchEmpresas();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
-        setSuccess(null);
 
         const errors = validateForm();
         if (errors.length > 0) {
@@ -118,35 +180,17 @@ const Empresas = () => {
             return;
         }
 
-        setLoading(true);
-        try {
-            if (isEditing) {
-                // Preparar datos para actualización (sin contraseñas si no se cambiaron)
-                const datosActualizacion = {
-                    ...currentEmpresa,
-                    contrasena: currentEmpresa.contrasena || undefined,
-                    confirmarContrasena: currentEmpresa.confirmarContrasena || undefined
-                };
-                await empresaService.actualizarEmpresa(datosActualizacion);
-                setSuccess('Empresa actualizada correctamente');
-            } else {
-                await empresaService.registroEmpresa(currentEmpresa);
-                setSuccess('Empresa registrada correctamente');
-            }
-            resetForm();
-            await fetchEmpresas();
-        } catch (err) {
-            setError(err.response?.data?.message || 'Error al procesar la solicitud');
-            console.error(err);
-        } finally {
-            setLoading(false);
+        if (isEditing) {
+            await handleUpdate();
+        } else {
+            await handleRegister();
         }
     };
 
     const editEmpresa = (empresa) => {
         setCurrentEmpresa({
             ...empresa,
-            contrasena: '', // Resetear contraseñas al editar
+            contrasena: '',
             confirmarContrasena: ''
         });
         setIsEditing(true);
@@ -162,8 +206,7 @@ const Empresas = () => {
             setSuccess('Empresa eliminada correctamente');
             await fetchEmpresas();
         } catch (err) {
-            setError('Error al eliminar la empresa');
-            console.error(err);
+            setError(err.message || 'Error al eliminar la empresa');
         } finally {
             setLoading(false);
         }
@@ -199,7 +242,6 @@ const Empresas = () => {
         navigate('/login');
     };
 
-    // Render
     return (
         <div className="app-container">
             {/* Navbar Superior */}
@@ -238,12 +280,12 @@ const Empresas = () => {
                     >
                         <span>Empresas</span>
                     </div>
-                                 <div
-                                                className={`menu-item ${isActive('/Usuarios') ? 'active' : ''}`}
-                                                onClick={() => navigate('/Usuarios')}
-                                        >
-                                                <span>Usuarios</span>
-                                        </div>
+                    <div
+                        className={`menu-item ${isActive('/Usuarios') ? 'active' : ''}`}
+                        onClick={() => navigate('/Usuarios')}
+                    >
+                        <span>Usuarios</span>
+                    </div>
                 </div>
             </aside>
 
@@ -414,6 +456,7 @@ const Empresas = () => {
                                                 value={currentEmpresa.contrasena}
                                                 onChange={handleInputChange}
                                                 required
+                                                minLength="8"
                                             />
                                         </div>
                                         <div className="form-group">
@@ -424,6 +467,7 @@ const Empresas = () => {
                                                 value={currentEmpresa.confirmarContrasena}
                                                 onChange={handleInputChange}
                                                 required
+                                                minLength="8"
                                             />
                                         </div>
                                     </>
@@ -440,6 +484,7 @@ const Empresas = () => {
                                                 value={currentEmpresa.contrasena}
                                                 onChange={handleInputChange}
                                                 placeholder="Nueva contraseña"
+                                                minLength="8"
                                             />
                                         </div>
                                         <div className="form-group">
@@ -450,6 +495,7 @@ const Empresas = () => {
                                                 value={currentEmpresa.confirmarContrasena}
                                                 onChange={handleInputChange}
                                                 placeholder="Confirmar nueva contraseña"
+                                                minLength="8"
                                             />
                                         </div>
                                     </>
@@ -502,14 +548,14 @@ const Empresas = () => {
                                 <table className="data-table">
                                     <thead>
                                         <tr>
-                                            <th>ID</th> {/* Agregar columna para ID */}
+                                            <th>ID</th>
                                             <th>Razón Social</th>
                                             <th>Nombre Comercial</th>
                                             <th>NIT</th>
-                                            <th>DV</th> {/* Agregar columna para DV */}
-                                            <th>Teléfono</th> {/* Agregar columna para Teléfono */}
-                                            <th>Email</th> {/* Agregar columna para Email */}
-                                            <th>Representante Legal</th> {/* Agregar columna para Representante Legal */}
+                                            <th>DV</th>
+                                            <th>Teléfono</th>
+                                            <th>Email</th>
+                                            <th>Representante Legal</th>
                                             <th>Estado</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -517,14 +563,14 @@ const Empresas = () => {
                                     <tbody>
                                         {empresas.map(empresa => (
                                             <tr key={empresa.id}>
-                                                <td>{empresa.id}</td> {/* Mostrar ID */}
+                                                <td>{empresa.id}</td>
                                                 <td>{empresa.razonSocial}</td>
                                                 <td>{empresa.nombreComercial}</td>
                                                 <td>{empresa.nit}</td>
-                                                <td>{empresa.dv}</td> {/* Mostrar DV */}
-                                                <td>{empresa.telefono}</td> {/* Mostrar Teléfono */}
-                                                <td>{empresa.email}</td> {/* Mostrar Email */}
-                                                <td>{empresa.representanteLegal}</td> {/* Mostrar Representante Legal */}
+                                                <td>{empresa.dv}</td>
+                                                <td>{empresa.telefono}</td>
+                                                <td>{empresa.email}</td>
+                                                <td>{empresa.representanteLegal}</td>
                                                 <td>
                                                     <span className={`status-badge ${empresa.activo ? 'active' : 'inactive'}`}>
                                                         {empresa.activo ? 'Activo' : 'Inactivo'}
@@ -534,12 +580,14 @@ const Empresas = () => {
                                                     <button
                                                         onClick={() => editEmpresa(empresa)}
                                                         className="action-btn edit"
+                                                        disabled={loading}
                                                     >
                                                         Editar
                                                     </button>
                                                     <button
                                                         onClick={() => deleteEmpresa(empresa.id)}
                                                         className="action-btn delete"
+                                                        disabled={loading}
                                                     >
                                                         Eliminar
                                                     </button>

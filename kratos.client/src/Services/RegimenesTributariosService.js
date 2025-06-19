@@ -28,7 +28,7 @@ const create = async (regimenData) => {
         const regimen = new RegimenTributario(regimenData);
         regimen.validate();
 
-        const response = await axios.post(`${ENDPOINT}/RegistrarRegimenTributario`, regimen.toJSON());
+        const response = await axios.post(`${ENDPOINT}/Registrar`, regimen.toJSON());
         return new RegimenTributario(response.data);
     } catch (error) {
         console.error('Error al crear el r�gimen:', error.response?.data || error.message);

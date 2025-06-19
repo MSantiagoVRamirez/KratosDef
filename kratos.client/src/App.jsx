@@ -15,6 +15,7 @@ import Inicio from './pages/Inicio';
 import Register from './pages/Register';
 import Empresa from './pages/Empresa';
 
+
 function App() {
     return (
         <Router>
@@ -26,6 +27,7 @@ function App() {
                 
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/Dashboard" element={<Dashboard />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
                     <Route path="/Home" element={<Home />} />
                     <Route path="/Regimenes" element={<Regimenes />} />

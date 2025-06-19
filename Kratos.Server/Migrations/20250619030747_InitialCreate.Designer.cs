@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kratos.Server.Migrations
 {
     [DbContext(typeof(KratosContext))]
-    [Migration("20250617215757_InitialCreate")]
+    [Migration("20250619030747_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

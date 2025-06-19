@@ -21,6 +21,7 @@ namespace kratos.Server.Controllers
             _context = context;
         }
 
+        // EmpresaController.cs
         [HttpPost]
         [Route("RegistroEmpresa")]
         public async Task<IActionResult> RegistroEmpresa([FromBody] Empresas empresa)
@@ -39,32 +40,37 @@ namespace kratos.Server.Controllers
 
             try
             {
-                // Validar que las contraseñas coincidan (antes de encriptar)
+                // Validar que el NIT no exista
+                if (await _context.Empresas.AnyAsync(e => e.nit == empresa.nit))
+                {
+                    return BadRequest(new { message = "El NIT ya está registrado" });
+                }
+
+                // Validar que las contraseñas coincidan
                 if (empresa.contrasena != empresa.confirmarContrasena)
                 {
                     return BadRequest(new { message = "Las contraseñas no coinciden" });
                 }
-      
 
                 // Encriptar contraseñas
                 empresa.contrasena = Encriptar.EncriptarClave(empresa.contrasena);
-                empresa.confirmarContrasena = Encriptar.EncriptarClave(empresa.confirmarContrasena);
+                empresa.confirmarContrasena = empresa.contrasena; // Asignar el mismo hash
 
                 // Establecer fechas automáticamente
-                empresa.creadoEn = DateTime.Now;
-                empresa.actualizadoEn = DateTime.Now;
-
-                // Asegurar que el estado activo sea true por defecto
+                empresa.creadoEn = DateTime.UtcNow;
+                empresa.actualizadoEn = DateTime.UtcNow;
                 empresa.activo = true;
 
                 await _context.Empresas.AddAsync(empresa);
                 await _context.SaveChangesAsync();
 
+                // No devolver las contraseñas ni información sensible
                 return Ok(new
                 {
                     message = "Empresa registrada exitosamente",
-                    empresaId = empresa.id
-        
+                    empresaId = empresa.id,
+                    razonSocial = empresa.razonSocial,
+                    nit = empresa.nit
                 });
             }
             catch (Exception ex)
@@ -77,6 +83,68 @@ namespace kratos.Server.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("ActualizarEmpresa")]
+        public async Task<IActionResult> ActualizarEmpresa([FromBody] Empresas empresa)
+        {
+            try
+            {
+                var empresaExistente = await _context.Empresas.FindAsync(empresa.id);
+                if (empresaExistente == null)
+                {
+                    return NotFound(new { message = "Empresa no encontrada" });
+                }
+
+                // Validar NIT único (si se está modificando)
+                if (empresaExistente.nit != empresa.nit &&
+                    await _context.Empresas.AnyAsync(e => e.nit == empresa.nit))
+                {
+                    return BadRequest(new { message = "El NIT ya está registrado por otra empresa" });
+                }
+
+                // Actualizar campos permitidos
+                empresaExistente.razonSocial = empresa.razonSocial;
+                empresaExistente.nombreComercial = empresa.nombreComercial;
+                empresaExistente.nit = empresa.nit;
+                empresaExistente.dv = empresa.dv;
+                empresaExistente.telefono = empresa.telefono;
+                empresaExistente.email = empresa.email;
+                empresaExistente.representanteLegal = empresa.representanteLegal;
+                empresaExistente.token = empresa.token;
+                empresaExistente.tiposociedadId = empresa.tiposociedadId;
+                empresaExistente.actividadId = empresa.actividadId;
+                empresaExistente.regimenId = empresa.regimenId;
+                empresaExistente.activo = empresa.activo;
+                empresaExistente.actualizadoEn = DateTime.UtcNow;
+
+                // Actualizar contraseña solo si se proporcionó una nueva
+                if (!string.IsNullOrEmpty(empresa.contrasena))
+                {
+                    if (empresa.contrasena != empresa.confirmarContrasena)
+                    {
+                        return BadRequest(new { message = "Las contraseñas no coinciden" });
+                    }
+                    empresaExistente.contrasena = Encriptar.EncriptarClave(empresa.contrasena);
+                }
+
+                _context.Empresas.Update(empresaExistente);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Empresa actualizada correctamente",
+                    empresaId = empresaExistente.id
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error al actualizar la empresa",
+                    details = ex.Message
+                });
+            }
+        }
         [HttpGet]
         [Route("ListarEmpresas")]
         public async Task<ActionResult<List<Empresas>>> ListarEmpresas()
@@ -92,68 +160,34 @@ namespace kratos.Server.Controllers
             return empresas;
         }
 
-        [HttpGet]
-        [Route("ConsultarEmpresa")]
-        public async Task<ActionResult<Empresas>> ConsultarEmpresa(int id)
-        {
-            var empresa = await _context.Empresas
-                .Include(e => e.empresasociedadFk)
-                .Include(e => e.empresaactividadFk)
-                .Include(e => e.empresaregimenFk)
-                .FirstOrDefaultAsync(e => e.id == id);
-
-            if (empresa == null)
-                return NotFound();
-
-            // No se puede desencriptar un hash, así que no se hace nada aquí
-
-            return empresa;
-        }
-
-        [HttpPut]
-        [Route("ActualizarEmpresa")]
-        public async Task<IActionResult> ActualizarEmpresa(Empresas empresa)
-        {
-            var empresaExistente = await _context.Empresas.FirstOrDefaultAsync(e => e.id == empresa.id);
-            if (empresaExistente == null)
-            {
-                return BadRequest("La empresa no existe.");
-            }
-
-            if (!string.IsNullOrEmpty(empresa.contrasena))
-                empresaExistente.contrasena = Encriptar.EncriptarClave(empresa.contrasena);
-
-            if (!string.IsNullOrEmpty(empresa.confirmarContrasena))
-                empresaExistente.confirmarContrasena = Encriptar.EncriptarClave(empresa.confirmarContrasena);
-
-            empresaExistente.tiposociedadId = empresa.tiposociedadId;
-            empresaExistente.actividadId = empresa.actividadId;
-            empresaExistente.regimenId = empresa.regimenId;
-            empresaExistente.token = empresa.token;
-            empresaExistente.nit = empresa.nit;
-            empresaExistente.dv = empresa.dv;
-            empresaExistente.telefono = empresa.telefono;
-            empresaExistente.activo = empresa.activo;
-            empresaExistente.creadoEn = empresa.creadoEn;
-            empresaExistente.actualizadoEn = DateTime.Now;
-
-            _context.Empresas.Update(empresaExistente);
-            await _context.SaveChangesAsync();
-            return Ok(empresaExistente);
-        }
-
         [HttpDelete]
-        [Route("EliminarEmpresa")]
+        [Route("EliminarEmpresa/{id}")]
         public async Task<IActionResult> EliminarEmpresa(int id)
         {
-            var empresaEliminada = await _context.Empresas.FindAsync(id);
-            if (empresaEliminada == null)
+            try
             {
-                return BadRequest();
+                var empresa = await _context.Empresas.FindAsync(id);
+                if (empresa == null)
+                {
+                    return NotFound(new { message = "Empresa no encontrada" });
+                }
+
+                // Cambiar a eliminación lógica en lugar de física
+                empresa.activo = false;
+                empresa.actualizadoEn = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Empresa desactivada correctamente" });
             }
-            _context.Empresas.Remove(empresaEliminada);
-            await _context.SaveChangesAsync();
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error al eliminar la empresa",
+                    details = ex.Message
+                });
+            }
         }
     }
 }
