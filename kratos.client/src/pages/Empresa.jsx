@@ -93,22 +93,46 @@ const Empresas = () => {
 
     const validateForm = () => {
         const errors = [];
-        const { razonSocial, nombreComercial, nit, contrasena, confirmarContrasena, email } = currentEmpresa;
+        const {
+            razonSocial,
+            nombreComercial,
+            nit,
+            contrasena,
+            confirmarContrasena,
+            email,
+            telefono,
+            representanteLegal,
+            tiposociedadId,
+            actividadId,
+            regimenId,
+            token
+        } = currentEmpresa;
 
-        // Validaciones básicas
-        if (!razonSocial.trim()) errors.push('Razón social es requerida');
-        if (!nombreComercial.trim()) errors.push('Nombre comercial es obligatorio');
-        if (!nit.trim()) errors.push('NIT es obligatorio');
+        // Validaciones requeridas
+        if (!razonSocial?.trim()) errors.push('Razón social es requerida');
+        if (!nombreComercial?.trim()) errors.push('Nombre comercial es obligatorio');
+        if (!nit?.trim()) errors.push('NIT es obligatorio');
+        if (!telefono?.trim()) errors.push('Teléfono es obligatorio');
+        if (!representanteLegal?.trim()) errors.push('Representante legal es obligatorio');
+        if (!token?.trim()) errors.push('Token de seguridad es obligatorio');
+        if (!tiposociedadId) errors.push('Tipo de sociedad es requerido');
+        if (!actividadId) errors.push('Actividad económica es requerida');
+        if (!regimenId) errors.push('Régimen tributario es requerido');
 
-        // Validar formato de email si se proporciona
+        // Validar email si está presente
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             errors.push('El email no tiene un formato válido');
         }
 
-        // Validar contraseñas solo para registro o si se están cambiando
+        // Validar contraseñas para registro o cambio
         if (!isEditing || contrasena) {
-            if (!contrasena) errors.push('Contraseña es requerida');
-            else if (contrasena.length < 8) errors.push('La contraseña debe tener al menos 8 caracteres');
+            if (!contrasena) {
+                errors.push('Contraseña es requerida');
+            } else {
+                if (contrasena.length < 8) errors.push('La contraseña debe tener al menos 8 caracteres');
+                if (!/[A-Z]/.test(contrasena)) errors.push('La contraseña debe contener al menos una mayúscula');
+                if (!/[0-9]/.test(contrasena)) errors.push('La contraseña debe contener al menos un número');
+            }
 
             if (contrasena !== confirmarContrasena) {
                 errors.push('Las contraseñas no coinciden');
@@ -117,18 +141,22 @@ const Empresas = () => {
 
         return errors;
     };
-
     const handleRegister = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            // Crear copia del objeto sin confirmarContrasena
+            // Preparar los datos como en el componente Register
             const empresaData = {
                 ...currentEmpresa,
-                confirmarContrasena: undefined // No se envía al backend
+                contrasena: currentEmpresa.contrasena,
+                confirmarContrasena: currentEmpresa.contrasena // Asegurar que coincidan
             };
-            delete empresaData.confirmarContrasena; // Eliminar el campo
+
+            // Eliminar campos que no deben enviarse
+            delete empresaData.id;
+            delete empresaData.creadoEn;
+            delete empresaData.actualizadoEn;
 
             await empresaService.registroEmpresa(empresaData);
 
@@ -136,28 +164,29 @@ const Empresas = () => {
             resetForm();
             await fetchEmpresas();
         } catch (err) {
-            setError(err.message);
+            // Mejor manejo de errores
+            if (err.response?.data?.errors) {
+                const errorMessages = Object.values(err.response.data.errors).flat();
+                setError(errorMessages.join(', '));
+            } else {
+                setError(err.message || 'Error al registrar la empresa');
+            }
         } finally {
             setLoading(false);
         }
     };
-
     const handleUpdate = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            // Crear copia del objeto
-            const empresaData = { ...currentEmpresa };
-
-            // Eliminar campos de contraseña si no se modificaron
-            if (!empresaData.contrasena) {
-                delete empresaData.contrasena;
-                delete empresaData.confirmarContrasena;
-            } else {
-                // Si se modificó la contraseña, eliminar solo confirmarContrasena
-                delete empresaData.confirmarContrasena;
-            }
+            // Preparar los datos para actualización
+            const empresaData = {
+                ...currentEmpresa,
+                // Solo enviar contraseña si se modificó
+                contrasena: currentEmpresa.contrasena || undefined,
+                confirmarContrasena: currentEmpresa.contrasena || undefined
+            };
 
             await empresaService.actualizarEmpresa(empresaData);
 
@@ -165,11 +194,17 @@ const Empresas = () => {
             resetForm();
             await fetchEmpresas();
         } catch (err) {
-            setError(err.message);
+            if (err.response?.data?.errors) {
+                const errorMessages = Object.values(err.response.data.errors).flat();
+                setError(errorMessages.join(', '));
+            } else {
+                setError(err.message || 'Error al actualizar la empresa');
+            }
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();

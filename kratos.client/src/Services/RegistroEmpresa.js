@@ -3,22 +3,40 @@ import axios from '../api/axios';
 const ENDPOINT = 'Empresa';
 
 const empresaService = {
-    registroEmpresa: async (empresaData) => {
-        try {
-            // Destructure to remove id without triggering unused var warning
-            const { id: _id, ...dataToSend } = empresaData;
+    // Cambiar en empresaService.js
+   
+        registroEmpresa: async (empresaData) => {
+            try {
+                const { id: _id, ...dataToSend } = empresaData;
 
-            const response = await axios.post(`${ENDPOINT}/RegistroEmpresa`, dataToSend, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error al registrar la empresa:', error.response?.data || error.message);
-            throw error;
-        }
-    },
+                // Cambiar la ruta para que coincida con el backend
+                const response = await axios.post(`${ENDPOINT}/insertar`, dataToSend, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                return response.data;
+            } catch (error) {
+                console.error('Error al registrar la empresa:', error.response?.data || error.message);
+                throw error;
+            }
+        },
+
+        actualizarEmpresa: async (empresaData) => {
+            try {
+                // Cambiar la ruta para que coincida con el backend
+                const response = await axios.put(`${ENDPOINT}/editar`, empresaData, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                return response.data;
+            } catch (error) {
+                console.error('Error al actualizar empresa:', error.response?.data || error.message);
+                throw error;
+            }
+        },
+
 
     listarEmpresas: async () => {
         try {
@@ -42,15 +60,7 @@ const empresaService = {
         }
     },
 
-    actualizarEmpresa: async (empresaData) => {
-        try {
-            const response = await axios.put(`${ENDPOINT}/ActualizarEmpresa`, empresaData);
-            return response.data;
-        } catch (error) {
-            console.error('Error al actualizar empresa:', error.response?.data || error.message);
-            throw error;
-        }
-    },
+
 
     eliminarEmpresa: async (id) => {
         try {
