@@ -694,7 +694,7 @@ namespace Kratos.Server.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("estado");
 
-                    b.Property<string>("nombre")
+                    b.Property<string>("nombres")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")

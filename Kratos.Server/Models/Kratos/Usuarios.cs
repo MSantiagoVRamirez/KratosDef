@@ -27,7 +27,7 @@ namespace kratos.Server.Models.Kratos
        
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
-        [Compare("Contrasena", ErrorMessage = "Las contraseñas no coinciden")]
+        [Compare("contrasena", ErrorMessage = "Las contraseñas no coinciden")]
         [DataType(DataType.Password)]
         public string confirmarContrasena { get; set; } = string.Empty;
 
@@ -45,7 +45,7 @@ namespace kratos.Server.Models.Kratos
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Column("nombres", TypeName = "varchar(100)")]
-        public string nombre { get; set; } = string.Empty;
+        public string nombres { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
@@ -66,6 +66,6 @@ namespace kratos.Server.Models.Kratos
 
         [Column("actualizadoEn", TypeName = "datetime")]
         public DateTime actualizadoEn { get; set; } = DateTime.UtcNow;
-        public virtual ICollection<PuntoVentas> PuntosVenta { get; set; }
+        public virtual ICollection<PuntoVentas> PuntosVenta { get; set; } = new List<PuntoVentas>();
     }
 }

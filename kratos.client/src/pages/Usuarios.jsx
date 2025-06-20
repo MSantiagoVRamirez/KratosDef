@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import UsuariosService from '../Services/UsuariosService';
+import RolesService from '../Services/RolesServices';
 import authService from '../services/IniciarSesion';
 import './Home.css';
 
@@ -9,7 +10,7 @@ const Usuarios = () => {
     const [roles, setRoles] = useState([]); // Nuevo estado para roles
     const [currentUsuario, setCurrentUsuario] = useState({
         id: 0,
-        nombres: '', // Cambiado de 'nombre' a 'nombres'
+        nombres: '', // Asegurar que coincide con el backend
         apellidos: '',
         rolesId: null,
         contrasena: '',
@@ -51,11 +52,11 @@ const Usuarios = () => {
     // Nueva función para cargar roles
     const fetchRoles = async () => {
         try {
-            const response = await fetch('https://localhost:7054/api/Roles/Listar');
-            const data = await response.json();
-            setRoles(data);
+            const data = await RolesService.getAll();
+            setRoles(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error('Error al cargar roles:', err);
+            setError('Error al cargar los roles');
         }
     };
 
@@ -112,7 +113,7 @@ const Usuarios = () => {
                 estado: currentUsuario.estado
             };
 
-            delete usuarioData.confirmarContrasena;
+          
 
             if (isEditing) {
                 await UsuariosService.update(usuarioData);
@@ -140,13 +141,7 @@ const Usuarios = () => {
     };
 
     const Actualizar = (usuario) => {
-        setCurrentUsuario({
-            ...usuario,
-            nombres: usuario.nombres,
-            contrasena: '',
-            confirmarContrasena: '',
-            rolesId: usuario.rolesId
-        });
+        setCurrentUsuario(usuario);
         setIsEditing(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -232,8 +227,8 @@ const Usuarios = () => {
                         onClick={() => navigate('/Home')}>
                         <span>Actividad Económica</span>
                     </div>
-                    <div className={`menu-item ${isActive('/Usuarios') ? 'active' : ''}`}
-                        onClick={() => navigate('/Usuarios')}>
+                    <div className={`menu-item ${isActive('/Regimenes') ? 'active' : ''}`}
+                        onClick={() => navigate('/Regimenes')}>
                         <span>Regímenes Tributarios</span>
                     </div>
                     <div className={`menu-item ${isActive('/TiposSociedad') ? 'active' : ''}`}

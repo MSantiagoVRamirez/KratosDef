@@ -327,7 +327,7 @@ const Empresas = () => {
             {/* Contenido Principal */}
             <main className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
                 <div className="content-container">
-                    <h2 className="page-title">Gestión de Empresas</h2>
+                    <h3 className="section-title">Gestión de Empresas</h3>
 
                     {/* Alertas */}
                     {error && (
@@ -345,7 +345,7 @@ const Empresas = () => {
 
                     {/* Formulario */}
                     <div className="form-section">
-                        <h3>{isEditing ? 'Editar Empresa' : 'Nueva Empresa'}</h3>
+                        <h3 className="section-title">{isEditing ? 'Editar Empresa' : 'Nueva Empresa'}</h3>
                         <form onSubmit={handleSubmit}>
                             <div className="form-grid">
                                 <div className="form-group">
