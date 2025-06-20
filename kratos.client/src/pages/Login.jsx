@@ -19,7 +19,7 @@ const Login = () => {
 
         try {
             await authService.iniciarSesion(email, password);
-            setSuccessMessage('Inicio de sesión exitoso. Redirigiendo...');
+            setSuccessMessage('Inicio de sesion exitoso. Redirigiendo...');
             
             // Mostrar mensaje por 2 segundos antes de redirigir
             setTimeout(() => {
@@ -27,7 +27,7 @@ const Login = () => {
             }, 2000);
             
         } catch (err) {
-            setError(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
+            setError(err.message || 'Error al iniciar sesion. Verifica tus credenciales.');
             console.error(err);
         } finally {
             setLoading(false);
@@ -38,7 +38,7 @@ const Login = () => {
         <div className="auth-container">
             <div className="auth-card">
                 <div className="auth-header">
-                    <h2>Iniciar Sesión</h2>
+                    <h2>Iniciar Sesion</h2>
                     <p>Ingresa tus credenciales para acceder al sistema</p>
                 </div>
 
@@ -58,7 +58,7 @@ const Login = () => {
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-field">
-                        <label htmlFor="email">Correo Electrónico</label>
+                        <label htmlFor="email">Correo Electronico</label>
                         <input
                             type="email"
                             id="email"
@@ -69,7 +69,7 @@ const Login = () => {
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="password">Contraseña</label>
+                        <label htmlFor="password">Password</label>
                         <input
                             type="password"
                             id="password"
@@ -85,16 +85,16 @@ const Login = () => {
                             className="primary-button"
                             disabled={loading}
                         >
-                            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                            {loading ? 'Iniciando sesion...' : 'Iniciar Sesion'}
                         </button>
                     </div>
                 </form>
 
                 <div className="auth-footer">
                     <p>
-                        ¿No tienes una cuenta?{' '}
+                        No tienes una cuenta?{' '}
                         <button className="link-button" onClick={() => navigate('/register')}>
-                            Regístrate aquí
+                            Registrate aqui
                         </button>
                     </p>
                 </div>

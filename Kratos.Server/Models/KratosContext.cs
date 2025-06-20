@@ -2,8 +2,7 @@
 using kratos.Server.Models.Kratos;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-using Microsoft.EntityFrameworkCore;
-using kratos.Server.Models.Kratos;
+
 using System.Collections.Generic;
 
 namespace Kratos.Server.Models
